@@ -13,6 +13,7 @@
   --black:#0f1117;--burg:#541521;--deep:#380d14;--red:#b51f32;--bright:#e63950;
   --cream:#f7f4f2;--muted:#9ca3af;--panel:#171a23;--line:#2a2e3d;--white:#fff;
   --green:#10b981;--amber:#f59e0b;--blue:#635bff;--purple:#8b5cf6;
+  --shadow:0 18px 55px rgba(31,41,55,.12);--accent:#635bff;
 }
 *{box-sizing:border-box} body{margin:0;background:var(--black);color:var(--cream);font-family:Inter,"Segoe UI",Tahoma,Arial,sans-serif}
 button,input,select,textarea{font:inherit} button{cursor:pointer}
@@ -66,6 +67,65 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 @keyframes birdFly{ 0%{transform:translateY(0) scale(1);} 100%{transform:translateY(-6px) scale(1.1) rotate(5deg);} }
 .leaf-fall{ position:absolute; font-size:12px; opacity:0.7; animation: leafFalling 4s linear infinite; }
 @keyframes leafFalling{ 0%{top:-10px; opacity:0; transform:translateX(0) rotate(0deg);} 50%{opacity:1;} 100%{top:100px; opacity:0; transform:translateX(30px) rotate(360deg);} }
+
+/* EVOLVE MOMENT Floating Component & Modal */
+.moment-box-card{
+  background: linear-gradient(135deg, #171a2d, #2a2350);
+  border: 1px solid var(--purple);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.moment-button{
+  border:0;cursor:pointer;display:flex;align-items:center;gap:12px;padding:11px 18px;border-radius:18px;background:#111827;color:#fff;box-shadow:0 16px 35px rgba(17,24,39,.25);transition:.22s;
+}
+.moment-button:hover{transform:translateY(-3px);box-shadow:0 20px 40px rgba(17,24,39,.3)}
+.spark{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#7c6cff,#a78bfa);font-size:21px;position:relative}
+.spark:after{content:"";position:absolute;inset:-4px;border:1px solid rgba(124,108,255,.4);border-radius:17px;animation:pulse 2s infinite}
+.btntext{text-align:right}.btntext strong{display:block;font-size:14px}.btntext small{display:block;color:#aeb6c5;font-size:11px;margin-top:2px}
+.badge-moment{background:#fff;color:#111827;border-radius:999px;font-size:10px;font-weight:800;padding:5px 7px;margin-right:2px}
+@keyframes pulse{50%{transform:scale(1.08);opacity:.35}}
+
+.overlay-moment{position:fixed;inset:0;background:rgba(15,23,42,.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+.overlay-moment.show{display:flex}
+.modal-moment{width:min(510px,100%);background:#171a23;color:#fff;border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);overflow:hidden;animation:enter .32s cubic-bezier(.2,.8,.2,1)}
+@keyframes enter{from{opacity:0;transform:translateY(22px) scale(.96)}to{opacity:1;transform:none}}
+.modal-top-moment{padding:30px 30px 20px;background:radial-gradient(circle at 80% 0,#382a63,transparent 55%),#171a23}
+.close-moment{float:left;border:0;background:#2a2e3d;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px}
+.eyebrow-moment{font-size:11px;color:var(--accent);font-weight:900;letter-spacing:.8px}
+.modal-moment h2{font-size:26px;margin:9px 0 5px}
+.question-moment{color:var(--muted);font-size:14px}
+.inputwrap-moment{padding:0 30px 22px}
+.textarea-moment{width:100%;height:125px;border:1.5px solid var(--line);background:#111319;color:#fff;border-radius:18px;padding:17px;font:inherit;resize:none;outline:none;transition:.2s}
+.textarea-moment:focus{border-color:#8b82ff;box-shadow:0 0 0 4px rgba(99,91,255,.15)}
+.suggestions-moment{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.chip-moment{border:1px solid var(--line);background:#212635;border-radius:999px;padding:8px 11px;font-size:11px;cursor:pointer;color:#d1d5db}
+.chip-moment:hover{border-color:#aaa4ff;color:#fff}
+.actions-moment{display:flex;gap:10px;margin-top:15px}
+.primary-moment{flex:1;border:0;border-radius:15px;padding:14px;background:var(--blue);color:#fff;font-weight:800;cursor:pointer}
+.primary-moment:hover{background:var(--purple)}
+.ghost-moment{border:1px solid var(--line);background:transparent;color:#d1d5db;border-radius:15px;padding:14px 18px;cursor:pointer}
+.analysis-moment{display:none;padding:0 30px 30px}
+.analysis-moment.show{display:block}
+.scan-moment{height:6px;background:#2a2e3d;border-radius:99px;overflow:hidden;margin:8px 0 20px}
+.scan-moment i{display:block;width:70%;height:100%;background:linear-gradient(90deg,#635bff,#a78bfa);animation:scan 1.2s infinite alternate}
+@keyframes scan{from{width:12%}to{width:92%}}
+.result-moment{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.metric-moment{background:#111319;border:1px solid var(--line);border-radius:15px;padding:13px}
+.metric-moment span{display:block;font-size:10px;color:var(--muted)}
+.metric-moment b{font-size:18px;margin-top:5px;display:block;color:var(--cream)}
+.continue-moment{width:100%;margin-top:15px;border:0;background:#635bff;color:#fff;border-radius:15px;padding:14px;font-weight:800;cursor:pointer}
+.success-moment{display:none;text-align:center;padding:10px 30px 35px}
+.success-moment.show{display:block}
+.orb-moment{width:92px;height:92px;margin:5px auto 16px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:34px;background:radial-gradient(circle at 35% 30%,#b5adff,#635bff 55%,#3d35a5);box-shadow:0 0 0 10px rgba(99,91,255,0.2),0 15px 35px rgba(99,91,255,.4);animation:pop .6s ease}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1)}}
+.success-moment h2{margin:0 0 7px}
+.success-moment p{color:var(--muted);font-size:13px}
+.gain-moment{font-size:25px;font-weight:900;color:#818cf8;margin:15px 0}
+.mini-moment{font-size:11px;color:var(--muted)}
 
 /* واجهة تسجيل الدخول */
 #loginScreen{position:fixed;inset:0;background:#0a0c12;z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -137,7 +197,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 <div class="top"><div><h1 id="greeting">مساء الخير 👋</h1><p id="today"></p></div><div class="actions"><button class="btn primary admin-only" onclick="openCreate()">＋ إنشاء مهمة</button></div></div>
 <div class="kpis" id="kpis"></div>
 <div class="grid2">
-  <div class="card"><h3>معدل الإنجاز والتطور (Growth Score)</h3><div style="display:flex;align-items:center;justify-content:space-around;padding:10px"><div style="text-align:center"><strong style="font-size:36px;color:var(--purple)" id="growthScore">0</strong><br><small style="color:var(--muted)">نقاط التطور Growth Score</small></div><div style="text-align:center"><strong style="font-size:36px;color:var(--green)" id="rate">0%</strong><br><small style="color:var(--muted)">معدل الإنجاز العام</small></div></div></div>
+  <div class="card"><h3>معدل الإنجاز والتطور الشخصي (Growth Score)</h3><div style="display:flex;align-items:center;justify-style:space-around;padding:10px"><div style="text-align:center"><strong style="font-size:36px;color:var(--purple)" id="growthScore">0</strong><br><small style="color:var(--muted)">نقاط التطور Growth Score</small></div><div style="text-align:center"><strong style="font-size:36px;color:var(--green)" id="rate">0%</strong><br><small style="color:var(--muted)">معدل إنجازك الشخصي</small></div></div></div>
   <div class="card"><h3>مستوى التطور الحالي</h3><b style="font-size:20px;color:var(--amber)" id="evoLevel">BUILDER</b><p style="color:var(--muted);font-size:12px;margin-top:5px">أنت تبني نتائج جيدة، استمر في رفع التقارير والمهام للمستوى التالي.</p></div>
 </div>
 <div class="grid2" style="margin-top:14px">
@@ -146,26 +206,34 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 </div>
 </section>
 
-<!-- السجل اليومي -->
+<!-- السجل اليومي (مطور بتقنية EVOLVE MOMENT) -->
 <section id="dailylog" class="page">
-<div class="sectionhead"><h2>السجل اليومي ومراقبة إنجاز الموظفين</h2></div>
+<div class="sectionhead"><h2>السجل اليومي وتجربة النمو التفاعلية</h2></div>
+
+<!-- بطاقة EVOLVE MOMENT التفاعلية -->
+<div class="moment-box-card">
+  <div>
+    <div style="font-size:11px;color:#aeb6c5;font-weight:900;letter-spacing:1px;margin-bottom:4px">EVOLVE MOMENT · DAILY CHECK-IN</div>
+    <h3 style="margin:0 0 6px;font-size:20px">حوّل إنجازك اليومي إلى خطوة نمو حقيقية ✦</h3>
+    <p style="margin:0;color:var(--muted);font-size:13px">دون ما حدث بفضلك اليوم لتقوم الماكينة بتحليله وإضافته لرحلتك.</p>
+  </div>
+  <button class="moment-button" onclick="openMomentModal()">
+    <span class="spark">✦</span>
+    <span class="btntext"><strong>ماذا أنجزت اليوم؟</strong><small>تسجيل إنجاز جديد</small></span>
+    <span class="badge-moment">+ NEW</span>
+  </button>
+</div>
+
 <div class="grid2">
   <div class="card">
-    <h3>✍️ تدوين عملك اليومي الروتيني</h3>
-    <form id="dailyLogForm">
-      <div class="field" style="margin-bottom:10px"><label>ما هي المهام والأعمال التي أنجزتها اليوم؟</label><textarea id="logText" class="textarea" rows="4" placeholder="مثلاً: قمت بزيارة 3 مواقع، إنهاء تقرير المبيعات..." required></textarea></div>
-      <button class="btn primary">إرسال التقرير اليومي</button>
-    </form>
-  </div>
-  <div class="card">
-    <h3>📋 سجل أعمالك المرفوعة مؤخراً</h3>
+    <h3>📋 إنجازاتك اليومية المسجلة مؤخراً</h3>
     <div class="tasklist" id="myLogsList"></div>
   </div>
-</div>
-<div class="card admin-only" style="margin-top:16px">
-  <h3>👀 لوحة مراقبة المدير (سجلات جميع الموظفين)</h3>
-  <div class="tablewrap" style="margin-top:10px">
-    <table class="table"><thead><tr><th>الموظف</th><th>العمل المنجز اليوم</th><th>التاريخ والوقت</th></tr></thead><tbody id="allLogsTable"></tbody></table>
+  <div class="card admin-only">
+    <h3>👀 لوحة مراقبة المدير (سجلات جميع الموظفين)</h3>
+    <div class="tablewrap" style="margin-top:10px">
+      <table class="table"><thead><tr><th>الموظف</th><th>الإنجاز والعمل المنجز</th><th>التاريخ والوقت</th></tr></thead><tbody id="allLogsTable"></tbody></table>
+    </div>
   </div>
 </div>
 </section>
@@ -246,6 +314,49 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 </div>
 </section>
 </main></div>
+
+<!-- Modal النافذة التفاعلية EVOLVE MOMENT -->
+<div class="overlay-moment" id="overlayMoment">
+ <div class="modal-moment" role="dialog" aria-modal="true">
+  <div class="modal-top-moment">
+    <button class="close-moment" onclick="closeMomentModal()">×</button>
+    <div class="eyebrow-moment">EVOLVE MOMENT · DAILY CHECK-IN</div>
+    <h2>ماذا حدث اليوم بفضلك؟</h2>
+    <div class="question-moment">لا تحتاج لكتابة مهمة كاملة. فقط احكِ لنا ماذا أنجزت.</div>
+  </div>
+  <div class="inputwrap-moment" id="inputStepMoment">
+   <textarea class="textarea-moment" id="achievementText" placeholder="مثال: تابعت 15 تاجر وتم تفعيل 8 منهم..."></textarea>
+   <div class="suggestions-moment">
+     <button class="chip-moment" onclick="fillChip('فعّلت متجرًا جديدًا')">فعّلت متجرًا جديدًا</button>
+     <button class="chip-moment" onclick="fillChip('حللت مشكلة معقدة')">حللت مشكلة</button>
+     <button class="chip-moment" onclick="fillChip('ساعدت أحد أفراد الفريق')">ساعدت أحد أفراد الفريق</button>
+     <button class="chip-moment" onclick="fillChip('حسّنت إجراءً في العمل')">حسّنت إجراءً</button>
+   </div>
+   <div class="actions-moment">
+     <button class="ghost-moment" onclick="closeMomentModal()">لاحقًا</button>
+     <button class="primary-moment" onclick="analyzeAchievement()">اكتشف الأثر ✦</button>
+   </div>
+  </div>
+  <div class="analysis-moment" id="analysisStepMoment">
+    <div style="font-weight:800;margin-bottom:6px">نحلل إنجازك ونحسب الأثر...</div>
+    <div class="scan-moment"><i></i></div>
+    <div class="result-moment">
+      <div class="metric-moment"><span>IMPACT</span><b>عالي</b></div>
+      <div class="metric-moment"><span>CONTRIBUTION</span><b>Execution</b></div>
+      <div class="metric-moment"><span>GROWTH</span><b>+42</b></div>
+    </div>
+    <button class="continue-moment" onclick="confirmAchievement()">أضف هذا إلى رحلتي</button>
+  </div>
+  <div class="success-moment" id="successStepMoment">
+    <div class="orb-moment">✓</div>
+    <h2>أنت تتطور.</h2>
+    <p>تم تحويل إنجازك إلى خطوة حقيقية في رحلتك المهنية.</p>
+    <div class="gain-moment">+42 Growth</div>
+    <div class="mini-moment">Execution ↑ · Impact ↑ · Momentum maintained</div>
+    <button class="continue-moment" onclick="closeMomentModal()">العودة إلى Dashboard</button>
+  </div>
+ </div>
+</div>
 
 <!-- modal إنشاء/تعديل مهمة -->
 <div class="modalbg" id="modal">
@@ -444,7 +555,7 @@ function renderAll() {
   const isAdmin = me.type === "Manager";
   document.querySelectorAll(".admin-only").forEach(el => el.style.display = isAdmin ? "block" : "none");
 
-  // الشجرة 3D
+  // الشجرة 3D المسندة للمستخدم الحالي
   const myDoneCount = tasks.filter(t => t.memberKey === me.firebaseKey && t.status === "Completed").length;
   const tree = renderTree3D(myDoneCount);
   document.getElementById("treeEmoji").textContent = tree.emoji;
@@ -463,16 +574,29 @@ function renderAll() {
   document.getElementById("today").textContent = new Date().toLocaleDateString("ar-YE",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 }
 
+// عرض Dashboard مع استعراض الأرقام والإنجازات الخاصة بكل عضو فقط
 function renderDashboard() {
-  const total = tasks.length, completed = tasks.filter(x => x.status === "Completed").length;
+  const me = getCurrentUser();
+  const isAdmin = me.type === "Manager";
+
+  // الأرقام والإنجازات تظهر الخاصة بالمستخدم الحالي فقط
+  const myTasks = tasks.filter(x => x.memberKey === me.firebaseKey);
+  const total = myTasks.length;
+  const completed = myTasks.filter(x => x.status === "Completed").length;
   const rate = total ? Math.round(completed / total * 100) : 0;
   
+  const myLogs = dailyLogs.filter(l => l.memberKey === me.firebaseKey);
+
   document.getElementById("kpis").innerHTML = [
-    ["إجمالي المهام", total, "↗ الكل"], ["مكتملة", completed, "↗ إنجاز"], ["قيد التنفيذ", tasks.filter(x => x.status === "In Progress").length, "نشطة"], ["لم تبدأ", tasks.filter(x => x.status === "Pending").length, "مُنتظرة"], ["متأخرة", tasks.filter(x => x.status === "Overdue").length, "تنبيه"]
+    ["إجمالي مهامي", total, "↗ الخاصة بي"],
+    ["مكتملة", completed, "↗ إنجازي"],
+    ["قيد التنفيذ", myTasks.filter(x => x.status === "In Progress").length, "نشطة"],
+    ["لم تبدأ", myTasks.filter(x => x.status === "Pending").length, "مُنتظرة"],
+    ["متأخرة", myTasks.filter(x => x.status === "Overdue").length, "تنبيه"]
   ].map(a => `<div class="card kpi"><span class="label">${a[0]}</span><strong>${a[1]}</strong><span class="trend">${a[2]}</span></div>`).join("");
 
   document.getElementById("rate").textContent = rate + "%";
-  document.getElementById("growthScore").textContent = completed * 55 + dailyLogs.length * 15;
+  document.getElementById("growthScore").textContent = (completed * 55) + (myLogs.length * 42);
 
   document.getElementById("membersTrees").innerHTML = members.map(m => {
     const c = tasks.filter(t => t.memberKey === m.firebaseKey && t.status === "Completed").length;
@@ -481,30 +605,56 @@ function renderDashboard() {
   }).join("");
 }
 
-// السجل اليومي
-document.getElementById("dailyLogForm").onsubmit = (e) => {
-  e.preventDefault();
-  const me = getCurrentUser();
-  const text = document.getElementById("logText").value.trim();
-  if (text) {
-    dailyLogsRef.push({
-      memberKey: me.firebaseKey,
-      memberName: me.name,
-      text: text,
-      timestamp: new Date().toLocaleString('ar-YE')
-    });
-    document.getElementById("logText").value = "";
-    toast("تم رفع تقريرك اليومي بنجاح!");
+// EVOLVE MOMENT - منطق النافذة التفاعلية
+function openMomentModal() {
+  document.getElementById("inputStepMoment").style.display = "block";
+  document.getElementById("analysisStepMoment").classList.remove("show");
+  document.getElementById("successStepMoment").classList.remove("show");
+  document.getElementById("achievementText").value = "";
+  document.getElementById("overlayMoment").classList.add("show");
+}
+
+function closeMomentModal() {
+  document.getElementById("overlayMoment").classList.remove("show");
+}
+
+function fillChip(text) {
+  document.getElementById("achievementText").value = text;
+}
+
+function analyzeAchievement() {
+  const txt = document.getElementById("achievementText").value.trim();
+  if(!txt) {
+    alert("يرجى كتابة إنجازك اليومي أولاً");
+    return;
   }
-};
+  document.getElementById("inputStepMoment").style.display = "none";
+  document.getElementById("analysisStepMoment").classList.add("show");
+}
+
+function confirmAchievement() {
+  const me = getCurrentUser();
+  const txt = document.getElementById("achievementText").value.trim();
+  
+  dailyLogsRef.push({
+    memberKey: me.firebaseKey,
+    memberName: me.name,
+    text: txt,
+    timestamp: new Date().toLocaleString('ar-YE')
+  });
+
+  document.getElementById("analysisStepMoment").classList.remove("show");
+  document.getElementById("successStepMoment").classList.add("show");
+  toast("تم تحويل إنجازك إلى نقطة نمو بالسحابة!");
+}
 
 function renderDailyLogs() {
   const me = getCurrentUser();
   const myLogs = dailyLogs.filter(l => l.memberKey === me.firebaseKey);
 
-  document.getElementById("myLogsList").innerHTML = myLogs.reverse().map(l => `
-    <div class="taskrow"><div><b>${l.text}</b><div class="meta">${l.timestamp}</div></div></div>
-  `).join("") || `<div style="color:var(--muted);padding:10px">لم تقم بتسجيل أي عمل اليوم بعد</div>`;
+  document.getElementById("myLogsList").innerHTML = myLogs.slice().reverse().map(l => `
+    <div class="taskrow"><div><b>${l.text}</b><div class="meta">${l.timestamp}</div></div><span class="badge completed">+42 Growth</span></div>
+  `).join("") || `<div style="color:var(--muted);padding:10px">لم تقم بتسجيل أي إنجاز اليوم بعد</div>`;
 
   document.getElementById("allLogsTable").innerHTML = dailyLogs.slice().reverse().map(l => `
     <tr><td><b>${l.memberName}</b></td><td>${l.text}</td><td><small style="color:var(--muted)">${l.timestamp}</small></td></tr>
