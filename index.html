@@ -3,40 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TaskFlow — نظام إدارة المهام والمراقبة اليومية</title>
+<title>TaskFlow & EVOLVE V2 — نظام إدارة المهام والمراقبة اليومية</title>
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <style>
 :root{
-  --black:#110e0d;--burg:#541521;--deep:#380d14;--red:#b51f32;--bright:#e63950;
-  --cream:#f7f4f2;--muted:#9e9492;--panel:#1c1716;--line:#2e2624;--white:#fff;
-  --green:#3eb47a;--amber:#d99e32;--blue:#5c93d4;
+  --black:#0f1117;--burg:#541521;--deep:#380d14;--red:#b51f32;--bright:#e63950;
+  --cream:#f7f4f2;--muted:#9ca3af;--panel:#171a23;--line:#2a2e3d;--white:#fff;
+  --green:#10b981;--amber:#f59e0b;--blue:#635bff;--purple:#8b5cf6;
 }
 *{box-sizing:border-box} body{margin:0;background:var(--black);color:var(--cream);font-family:Inter,"Segoe UI",Tahoma,Arial,sans-serif}
 button,input,select,textarea{font:inherit} button{cursor:pointer}
-.app{display:flex;min-height:100vh}.sidebar{width:260px;background:#0c0a09;border-left:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:20}
-.brand{display:flex;gap:12px;align-items:center;padding:5px 8px 18px}.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--bright),var(--deep));display:grid;place-items:center;font-weight:900;box-shadow:0 4px 12px rgba(230,57,80,0.3)}.brand b{font-size:18px}.brand small{color:var(--muted)}
-.nav{display:grid;gap:4px}.nav button{border:0;background:transparent;color:#b0a7a4;text-align:right;padding:11px;border-radius:10px;display:flex;gap:10px;align-items:center}.nav button:hover,.nav button.active{background:var(--burg);color:white}.nav i{width:20px;text-align:center;font-style:normal}
-.bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:10px}.profile{display:flex;align-items:center;gap:10px;padding:8px}.avatar{width:36px;height:36px;border-radius:50%;background:var(--bright);display:grid;place-items:center;font-weight:800}.profile small{color:var(--muted)}
-.main{width:calc(100% - 260px);margin-right:260px;padding:24px;max-width:1800px}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:20px}.top h1{margin:0 0 4px;font-size:26px}.top p{margin:0;color:var(--muted)}.actions{display:flex;gap:10px;align-items:center}.btn{border:1px solid var(--line);background:#211b1a;color:var(--cream);padding:10px 14px;border-radius:9px}.btn.primary{background:var(--red);border-color:var(--red);font-weight:700}.btn.primary:hover{background:var(--bright)}.btn.danger{background:#581c20;border-color:#b51f32;color:#fff}.iconbtn{width:40px;height:40px;padding:0}
+.app{display:flex;min-height:100vh}.sidebar{width:260px;background:#0b0d12;border-left:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:20}
+.brand{display:flex;gap:12px;align-items:center;padding:5px 8px 18px}.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--purple),var(--blue));display:grid;place-items:center;font-weight:900;box-shadow:0 4px 12px rgba(139,92,246,0.4)}.brand b{font-size:18px}.brand small{color:var(--muted)}
+.nav{display:grid;gap:4px}.nav button{border:0;background:transparent;color:#9ca3af;text-align:right;padding:11px;border-radius:10px;display:flex;gap:10px;align-items:center}.nav button:hover,.nav button.active{background:rgba(255,255,255,0.08);color:white}.nav i{width:20px;text-align:center;font-style:normal}
+.bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:10px}.profile{display:flex;align-items:center;gap:10px;padding:8px}.avatar{width:36px;height:36px;border-radius:50%;background:var(--purple);display:grid;place-items:center;font-weight:800}.profile small{color:var(--muted)}
+.main{width:calc(100% - 260px);margin-right:260px;padding:24px;max-width:1800px}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:20px}.top h1{margin:0 0 4px;font-size:26px}.top p{margin:0;color:var(--muted)}.actions{display:flex;gap:10px;align-items:center}.btn{border:1px solid var(--line);background:#212635;color:var(--cream);padding:10px 14px;border-radius:9px;font-weight:600}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.primary:hover{background:var(--purple)}.btn.danger{background:#581c20;border-color:#b51f32;color:#fff}.btn.success{background:#059669;border-color:#10b981;color:#fff}.iconbtn{width:40px;height:40px;padding:0}
 .page{display:none}.page.active{display:block}
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}.kpi{position:relative;overflow:hidden}.kpi:after{content:"";position:absolute;width:60px;height:60px;border-radius:50%;background:var(--burg);opacity:.25;left:-15px;top:-15px}.kpi .label{color:var(--muted);font-size:12px}.kpi strong{display:block;font-size:26px;margin:6px 0}.trend{font-size:11px;color:var(--green)}
-.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-top:14px}.grid3{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;margin-top:14px}.card h3{margin:0 0 14px;font-size:15px}.chart{height:200px;display:flex;align-items:end;gap:10px;padding:10px 5px 0}.bar{flex:1;background:linear-gradient(to top,var(--deep),var(--bright));border-radius:6px 6px 2px 2px;min-height:10px;position:relative}.bar span{position:absolute;bottom:-22px;width:100%;text-align:center;color:var(--muted);font-size:10px}.ring{width:140px;height:140px;border-radius:50%;margin:auto;background:conic-gradient(var(--bright) var(--p),#302725 0);display:grid;place-items:center}.ring:after{content:"";width:102px;height:102px;background:var(--panel);border-radius:50%;position:absolute}.ring b{position:relative;z-index:1;font-size:26px}.tasklist{display:grid;gap:8px}.taskrow{border:1px solid var(--line);border-radius:10px;padding:11px;display:flex;justify-content:space-between;gap:10px;align-items:center}.taskrow:hover{border-color:#5b3a3f}.tasktitle{font-weight:700}.meta{color:var(--muted);font-size:12px;margin-top:3px}.badge{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.pending{background:#3a3027;color:#e0b76b}.progress{background:#282f3a;color:#79a7e3}.completed{background:#1f362b;color:#68c59c}.overdue{background:#401b22;color:#ff7182}.cancelled{background:#2d2827;color:#aaa}
-.sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.sectionhead h2{margin:0}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.input,.select,.textarea{background:#161211;color:var(--cream);border:1px solid var(--line);border-radius:9px;padding:9px 12px;outline:none}.input:focus,.select:focus,.textarea:focus{border-color:var(--bright)}.search{min-width:240px}
-.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.table{width:100%;border-collapse:collapse;min-width:850px}.table th,.table td{padding:12px;border-bottom:1px solid var(--line);text-align:right}.table th{color:var(--muted);font-size:12px;background:#161211}.table td{font-size:13px}.progressbar{height:7px;background:#2d2624;border-radius:999px;overflow:hidden;min-width:80px}.progressbar i{display:block;height:100%;background:var(--bright);border-radius:inherit}
-.board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.column{background:#161211;border:1px solid var(--line);border-radius:12px;padding:12px;min-height:420px}.colhead{display:flex;justify-content:space-between;margin-bottom:10px}.dropzone{min-height:360px;display:grid;align-content:start;gap:8px}.boardcard{background:#211b1a;border:1px solid var(--line);border-radius:10px;padding:12px}.boardcard[draggable=true]{cursor:grab}
-.members{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.member{display:flex;gap:12px;align-items:center}.member .avatar{flex:none}.memberinfo{flex:1}.memberstats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:10px}.memberstats div{background:#151110;border-radius:8px;padding:6px;text-align:center}.memberstats b{display:block}.memberstats small{color:var(--muted)}
-.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.day{min-height:100px;background:#161211;border:1px solid var(--line);border-radius:8px;padding:6px}.daynum{font-size:11px;color:var(--muted)}.event{font-size:10px;background:var(--burg);padding:4px;border-radius:4px;margin-top:5px;overflow:hidden;cursor:pointer}
-.modalbg{display:none;position:fixed;inset:0;background:#000c;z-index:50;align-items:center;justify-content:center;padding:20px}.modalbg.show{display:flex}.modal{width:min(700px,100%);max-height:90vh;overflow:auto;background:#1a1514;border:1px solid #4a3335;border-radius:16px;padding:20px}.modalhead{display:flex;justify-content:space-between;align-items:center}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:12px;color:var(--muted)}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
-.toast{position:fixed;left:20px;bottom:20px;background:#241b1a;border:1px solid #58363c;padding:10px 16px;border-radius:10px;z-index:100;transform:translateY(120px);transition:.25s}.toast.show{transform:translateY(0)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,0.2)}.kpi{position:relative;overflow:hidden}.kpi .label{color:var(--muted);font-size:12px}.kpi strong{display:block;font-size:26px;margin:6px 0}.trend{font-size:11px;color:var(--green)}
+.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-top:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}.card h3{margin:0 0 14px;font-size:15px}.tasklist{display:grid;gap:8px}.taskrow{border:1px solid var(--line);border-radius:10px;padding:11px;display:flex;justify-content:space-between;gap:10px;align-items:center;background:#13151f}.tasktitle{font-weight:700}.meta{color:var(--muted);font-size:12px;margin-top:3px}.badge{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.pending{background:#3a3027;color:#e0b76b}.progress{background:#282f3a;color:#79a7e3}.completed{background:#1f362b;color:#68c59c}.overdue{background:#401b22;color:#ff7182}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.sectionhead h2{margin:0}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.input,.select,.textarea{background:#111319;color:var(--cream);border:1px solid var(--line);border-radius:9px;padding:9px 12px;outline:none}.input:focus,.select:focus,.textarea:focus{border-color:var(--purple)}.search{min-width:220px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}.table{width:100%;border-collapse:collapse;min-width:850px}.table th,.table td{padding:12px;border-bottom:1px solid var(--line);text-align:right}.table th{color:var(--muted);font-size:12px;background:#111319}.table td{font-size:13px}.progressbar{height:7px;background:#2a2e3d;border-radius:999px;overflow:hidden;min-width:80px}.progressbar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:inherit}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.column{background:#111319;border:1px solid var(--line);border-radius:12px;padding:12px;min-height:420px}.colhead{display:flex;justify-content:space-between;margin-bottom:10px}.dropzone{min-height:360px;display:grid;align-content:start;gap:8px}.boardcard{background:#1b1e2a;border:1px solid var(--line);border-radius:10px;padding:12px}.boardcard[draggable=true]{cursor:grab}
+.members{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.member{display:flex;gap:12px;align-items:center}.memberinfo{flex:1}.memberstats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:10px}.memberstats div{background:#111319;border-radius:8px;padding:6px;text-align:center}.memberstats b{display:block}.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.day{min-height:100px;background:#111319;border:1px solid var(--line);border-radius:8px;padding:6px}.daynum{font-size:11px;color:var(--muted)}.event{font-size:10px;background:var(--purple);padding:4px;border-radius:4px;margin-top:5px;cursor:pointer}
+.modalbg{display:none;position:fixed;inset:0;background:#000c;z-index:50;align-items:center;justify-content:center;padding:20px}.modalbg.show{display:flex}.modal{width:min(720px,100%);max-height:90vh;overflow:auto;background:#171a23;border:1px solid var(--line);border-radius:16px;padding:20px}.modalhead{display:flex;justify-content:space-between;align-items:center}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:5px}.field.full{grid-column:1/-1}.field label{font-size:12px;color:var(--muted)}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.toast{position:fixed;left:20px;bottom:20px;background:#171a23;border:1px solid var(--purple);padding:10px 16px;border-radius:10px;z-index:100;transform:translateY(120px);transition:.25s}.toast.show{transform:translateY(0)}
 .mobiletop{display:none}.close{border:0;background:transparent;color:var(--muted);font-size:22px}
 
-/* الشجرة التفاعلية ثلاثية الأبعاد 3D */
+/* الشجرة التفاعلية ثلاثية الأبعاد الـ 3D & EVOLVE Ring */
 .tree-3d-box{
-  background: radial-gradient(circle at 50% 30%, #1e2e1a 0%, #121810 70%, #0a0d08 100%);
-  border: 1px solid #2f4e25;
+  background: radial-gradient(circle at 50% 30%, #1e2838 0%, #111520 70%, #0a0c12 100%);
+  border: 1px solid var(--line);
   border-radius: 16px;
   padding: 16px;
   text-align: center;
@@ -47,46 +46,42 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 }
 .tree-stage-3d{
   perspective: 600px;
-  height: 110px;
+  height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
 }
 .tree-avatar-3d{
-  font-size: 64px;
+  font-size: 60px;
   transform-style: preserve-3d;
   animation: floatTree 4s ease-in-out infinite;
-  filter: drop-shadow(0 15px 12px rgba(0,0,0,0.6)) drop-shadow(0 0 15px rgba(62,180,122,0.4));
+  filter: drop-shadow(0 15px 12px rgba(0,0,0,0.6)) drop-shadow(0 0 15px rgba(139,92,246,0.4));
   transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 @keyframes floatTree{ 0%,100%{transform: translateY(0) rotateY(-5deg);} 50%{transform: translateY(-8px) rotateY(5deg);} }
-
-/* عناصر الشجرة المتحركة (طيور ورسومات وأوراق) */
 .bird-element{ position:absolute; font-size:18px; animation: birdFly 3s ease-in-out infinite alternate; filter:drop-shadow(0 4px 6px #000); }
 .bird-left{ top:15px; left:20px; }
 .bird-right{ top:25px; right:20px; animation-delay:1.5s; }
 @keyframes birdFly{ 0%{transform:translateY(0) scale(1);} 100%{transform:translateY(-6px) scale(1.1) rotate(5deg);} }
-
 .leaf-fall{ position:absolute; font-size:12px; opacity:0.7; animation: leafFalling 4s linear infinite; }
 @keyframes leafFalling{ 0%{top:-10px; opacity:0; transform:translateX(0) rotate(0deg);} 50%{opacity:1;} 100%{top:100px; opacity:0; transform:translateX(30px) rotate(360deg);} }
 
-/* واجهة تسجيل الدخول بالكتابة اليدوية */
-#loginScreen{position:fixed;inset:0;background:#0a0808;z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-box{background:#161211;border:1px solid #4a1520;border-radius:18px;padding:32px;width:min(400px,100%);box-shadow:0 15px 40px #0009}
+/* واجهة تسجيل الدخول */
+#loginScreen{position:fixed;inset:0;background:#0a0c12;z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:#171a23;border:1px solid var(--line);border-radius:18px;padding:32px;width:min(400px,100%);box-shadow:0 15px 40px #0009}
 
-@media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.grid2,.grid3{grid-template-columns:1fr}.members{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:760px){.sidebar{transform:translateX(100%);transition:.2s;width:280px}.sidebar.open{transform:translateX(0)}.main{width:100%;margin:0;padding:16px}.mobiletop{display:flex;justify-content:space-between;margin-bottom:14px}.kpis{grid-template-columns:repeat(2,1fr)}.members,.board{grid-template-columns:1fr}.calendar{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start;flex-direction:column}.actions{width:100%}.search{min-width:0;width:100%}.formgrid{grid-template-columns:1fr}}
+@media(max-width:950px){.sidebar{transform:translateX(100%);transition:.2s;width:280px}.sidebar.open{transform:translateX(0)}.main{width:100%;margin:0;padding:16px}.mobiletop{display:flex;justify-content:space-between;margin-bottom:14px}.grid2,.grid3,.board{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- واجهة تسجيل الدخول اليدوية -->
+<!-- واجهة تسجيل الدخول -->
 <div id="loginScreen">
   <div class="login-box">
     <div style="text-align:center;margin-bottom:22px">
       <div class="logo" style="margin:auto;width:52px;height:52px;font-size:24px">T</div>
-      <h2 style="margin:12px 0 4px;font-size:22px">TaskFlow Login</h2>
+      <h2 style="margin:12px 0 4px;font-size:22px">TaskFlow & EVOLVE</h2>
       <p style="color:var(--muted);font-size:13px;margin:0">أدخل بياناتك للدخول إلى النظام</p>
     </div>
     <form id="loginForm">
@@ -105,44 +100,45 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 
 <div class="app" id="appMain" style="display:none">
 <aside class="sidebar" id="sidebar">
-  <div class="brand"><div class="logo">T</div><div><b>TaskFlow</b><br><small>تطبيق إدارة المهام</small></div></div>
+  <div class="brand"><div class="logo">E</div><div><b>EVOLVE V2</b><br><small>TaskFlow & Growth</small></div></div>
   
-  <!-- شجرة النمو 3D التفاعلية -->
+  <!-- الشجرة 3D -->
   <div class="tree-3d-box">
     <div id="birdContainer"></div>
     <div id="leafContainer"></div>
     <div class="tree-stage-3d">
       <div class="tree-avatar-3d" id="treeEmoji">🌰</div>
     </div>
-    <div style="font-weight:bold;font-size:13px;margin-top:4px" id="treeStage">شتلة الإنجاز</div>
+    <div style="font-weight:bold;font-size:13px;margin-top:4px" id="treeStage">بذرة الإنجاز</div>
     <small style="color:var(--green);display:block;margin-top:2px" id="treeLevel">مكتمل: 0 مهمة</small>
   </div>
 
-  <nav class="nav">
-    <button class="active" data-page="dashboard"><i>⌂</i><span>الرئيسية</span></button>
-    <button data-page="tasks"><i>✓</i><span>المهام</span></button>
-    <button data-page="dailylog"><i>📝</i><span>السجل اليومي</span></button>
-    <button data-page="calendar"><i>▦</i><span>التقويم</span></button>
-    <button data-page="board"><i>▤</i><span>اللوحة Kanban</span></button>
-    <button data-page="members"><i>◉</i><span>الأعضاء والإدارة</span></button>
-    <button data-page="reports"><i>◫</i><span>التقارير</span></button>
-    <button data-page="settings"><i>⚙</i><span>الإعدادات</span></button>
+  <nav class="nav" id="sidebarNav">
+    <button class="nav-btn active" data-page="dashboard" id="nav_dashboard"><i>⌂</i><span>الرئيسية</span></button>
+    <button class="nav-btn" data-page="tasks" id="nav_tasks"><i>✓</i><span>المهام</span></button>
+    <button class="nav-btn" data-page="dailylog" id="nav_dailylog"><i>📝</i><span>السجل اليومي</span></button>
+    <button class="nav-btn" data-page="calendar" id="nav_calendar"><i>▦</i><span>التقويم</span></button>
+    <button class="nav-btn" data-page="board" id="nav_board"><i>▤</i><span>اللوحة Kanban</span></button>
+    <button class="nav-btn" data-page="members" id="nav_members"><i>◉</i><span>الأعضاء والإدارة</span></button>
+    <button class="nav-btn" data-page="reports" id="nav_reports"><i>◫</i><span>التقارير والتصدير</span></button>
+    <button class="nav-btn" data-page="settings" id="nav_settings"><i>⚙</i><span>الإعدادات</span></button>
   </nav>
   <div class="bottom">
     <div class="profile"><div class="avatar" id="myAvatar">م</div><div><b id="myNavName">...</b><br><small id="myNavRole">...</small></div></div>
-    <button class="nav" style="width:100%;margin-top:6px" onclick="logout()"><span>↪ خروج من الحساب</span></button>
+    <button class="btn" style="width:100%;margin-top:6px;background:transparent;border-color:var(--line)" onclick="logout()"><span>↪ خروج من الحساب</span></button>
   </div>
 </aside>
 
 <main class="main">
 <div class="mobiletop"><button class="btn iconbtn" onclick="toggleMenu()">☰</button></div>
 
+<!-- الرئيسية Dashboard -->
 <section id="dashboard" class="page active">
 <div class="top"><div><h1 id="greeting">مساء الخير 👋</h1><p id="today"></p></div><div class="actions"><button class="btn primary admin-only" onclick="openCreate()">＋ إنشاء مهمة</button></div></div>
 <div class="kpis" id="kpis"></div>
 <div class="grid2">
-  <div class="card"><h3>المهام خلال الأسبوع</h3><div class="chart" id="chart"></div></div>
-  <div class="card"><h3>معدل الإنجاز العام</h3><div class="ring" id="ring"><b id="rate">0%</b></div></div>
+  <div class="card"><h3>معدل الإنجاز والتطور (Growth Score)</h3><div style="display:flex;align-items:center;justify-content:space-around;padding:10px"><div style="text-align:center"><strong style="font-size:36px;color:var(--purple)" id="growthScore">0</strong><br><small style="color:var(--muted)">نقاط التطور Growth Score</small></div><div style="text-align:center"><strong style="font-size:36px;color:var(--green)" id="rate">0%</strong><br><small style="color:var(--muted)">معدل الإنجاز العام</small></div></div></div>
+  <div class="card"><h3>مستوى التطور الحالي</h3><b style="font-size:20px;color:var(--amber)" id="evoLevel">BUILDER</b><p style="color:var(--muted);font-size:12px;margin-top:5px">أنت تبني نتائج جيدة، استمر في رفع التقارير والمهام للمستوى التالي.</p></div>
 </div>
 <div class="grid2" style="margin-top:14px">
   <div class="card"><h3>أشجار نمو الفريق 🌳</h3><div id="membersTrees" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:10px"></div></div>
@@ -150,14 +146,14 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 </div>
 </section>
 
-<!-- قسم السجل اليومي للأعمال الروتيني والمراقبة -->
+<!-- السجل اليومي -->
 <section id="dailylog" class="page">
 <div class="sectionhead"><h2>السجل اليومي ومراقبة إنجاز الموظفين</h2></div>
 <div class="grid2">
   <div class="card">
     <h3>✍️ تدوين عملك اليومي الروتيني</h3>
     <form id="dailyLogForm">
-      <div class="field" style="margin-bottom:10px"><label>ما هي المهام والأعمال التي أنجزتها اليوم؟</label><textarea id="logText" class="textarea" rows="4" placeholder="مثلاً: قمت بزيارة 3 مواقع، إنهاء تقرير المبيعات، ومتابعة الاتصالات..." required></textarea></div>
+      <div class="field" style="margin-bottom:10px"><label>ما هي المهام والأعمال التي أنجزتها اليوم؟</label><textarea id="logText" class="textarea" rows="4" placeholder="مثلاً: قمت بزيارة 3 مواقع، إنهاء تقرير المبيعات..." required></textarea></div>
       <button class="btn primary">إرسال التقرير اليومي</button>
     </form>
   </div>
@@ -174,6 +170,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 </div>
 </section>
 
+<!-- إدارة المهام -->
 <section id="tasks" class="page">
 <div class="sectionhead"><h2>إدارة المهام</h2><button class="btn primary admin-only" onclick="openCreate()">＋ إنشاء مهمة</button></div>
 <div class="card">
@@ -181,11 +178,65 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 <div class="tablewrap"><table class="table"><thead><tr><th>المهمة</th><th>المسند إليه</th><th>الأولوية</th><th>الحالة</th><th>البداية</th><th>الاستحقاق</th><th>الإنجاز</th><th>إجراء</th></tr></thead><tbody id="taskTable"></tbody></table></div>
 </div></section>
 
+<!-- التقويم -->
 <section id="calendar" class="page"><div class="sectionhead"><h2>التقويم</h2></div><div class="card"><div class="calendar" id="calendarGrid"></div></div></section>
-<section id="board" class="page"><div class="sectionhead"><h2>Board (سحب وإفلات)</h2><button class="btn primary admin-only" onclick="openCreate()">＋ إنشاء مهمة</button></div><div class="board" id="boardGrid"></div></section>
-<section id="members" class="page"><div class="sectionhead"><h2>أعضاء الفريق والإدارة</h2><button class="btn primary admin-only" onclick="openMemberModal()">＋ إضافة عضو جديد</button></div><div class="members" id="membersGrid"></div></section>
-<section id="reports" class="page"><div class="sectionhead"><h2>التقارير والأداء</h2></div><div class="kpis" id="reportKpis"></div><div class="grid2" style="margin-top:14px"><div class="card"><h3>الأداء حسب العضو</h3><div id="performance"></div></div><div class="card"><h3>توزيع الحالات</h3><div id="statusReport"></div></div></div></section>
 
+<!-- Kanban -->
+<section id="board" class="page"><div class="sectionhead"><h2>Board (سحب وإفلات)</h2><button class="btn primary admin-only" onclick="openCreate()">＋ إنشاء مهمة</button></div><div class="board" id="boardGrid"></div></section>
+
+<!-- الأعضاء والإدارة + التحكم بالصلاحيات والإيقونات -->
+<section id="members" class="page">
+<div class="sectionhead"><h2>أعضاء الفريق والتحكم بالصلاحيات</h2><button class="btn primary admin-only" onclick="openMemberModal()">＋ إضافة عضو جديد</button></div>
+<div class="members" id="membersGrid"></div>
+</section>
+
+<!-- قسم التقارير الشامل المطور مع الفلاتر والتصدير -->
+<section id="reports" class="page">
+<div class="sectionhead">
+  <h2>التقارير المتقدمة والتصدير</h2>
+  <div class="actions">
+    <button class="btn success" onclick="exportReportCSV()">📥 تصدير Excel / CSV</button>
+    <button class="btn primary" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+  <h3>🔍 فلاتر التقارير الشاملة</h3>
+  <div class="formgrid">
+    <div class="field">
+      <label>نوع التقرير</label>
+      <select id="reportTypeFilter" class="select" onchange="renderAdvancedReports()">
+        <option value="all">الجميع (المهام + السجل اليومي)</option>
+        <option value="tasks">المهام فقط</option>
+        <option value="dailylog">السجل اليومي فقط</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>الموظف / العضو</label>
+      <select id="reportMemberFilter" class="select" onchange="renderAdvancedReports()"></select>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>📊 نتائج التقرير المفلترة</h3>
+  <div class="tablewrap" style="margin-top:10px">
+    <table class="table" id="reportResultTable">
+      <thead>
+        <tr>
+          <th>النوع</th>
+          <th>الموظف</th>
+          <th>العنوان / تفاصيل العمل</th>
+          <th>الحالة / التاريخ</th>
+        </tr>
+      </thead>
+      <tbody id="reportResultBody"></tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- الإعدادات -->
 <section id="settings" class="page">
 <div class="sectionhead"><h2>إعدادات الحساب والحماية</h2></div>
 <div class="card" style="max-width:500px">
@@ -196,7 +247,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 </section>
 </main></div>
 
-<!-- نافذة إنشاء/تعديل مهمة -->
+<!-- modal إنشاء/تعديل مهمة -->
 <div class="modalbg" id="modal">
 <div class="modal">
 <div class="modalhead"><h2 id="modalTitle">إنشاء مهمة</h2><button class="close" onclick="closeModal()">×</button></div>
@@ -214,19 +265,27 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 <div class="modalfoot"><button type="button" class="btn" onclick="closeModal()">إلغاء</button><button class="btn primary">حفظ المهمة</button></div>
 </form></div></div>
 
-<!-- نافذة إضافة عضو جديد -->
+<!-- modal إضافة/تعديل عضو جديد -->
 <div class="modalbg" id="memberModal">
 <div class="modal">
-<div class="modalhead"><h2>إضافة عضو جديد بالسحابة</h2><button class="close" onclick="closeMemberModal()">×</button></div>
+<div class="modalhead"><h2 id="memberModalTitle">إضافة عضو جديد بالسحابة</h2><button class="close" onclick="closeMemberModal()">×</button></div>
 <form id="memberForm">
 <div class="formgrid">
 <div class="field full"><label>الاسم الكامل</label><input id="mName" class="input" required placeholder="مثال: أحمد علي"></div>
 <div class="field"><label>الدور الوظيفي</label><input id="mRole" class="input" required placeholder="مثال: ممثل ميداني"></div>
 <div class="field"><label>نوع الصلاحية</label><select id="mType" class="select"><option value="Member">عضو (تنفيذ فقط)</option><option value="Manager">مدير نظام (صلاحيات كاملة)</option></select></div>
-<div class="field full"><label>كلمة المرور الافتراضية</label><input id="mPass" type="text" class="input" required value="123456"></div>
+<div class="field full"><label>كلمة المرور</label><input id="mPass" type="text" class="input" required value="123456"></div>
 </div>
 <div class="modalfoot"><button type="button" class="btn" onclick="closeMemberModal()">إلغاء</button><button class="btn primary">حفظ العضو بالسحابة</button></div>
 </form></div></div>
+
+<!-- modal التحكم بإخفاء الأيقونات للنسخة المرئية لكل موظف -->
+<div class="modalbg" id="permissionsModal">
+<div class="modal">
+<div class="modalhead"><h2>إدارة الأيقونات المرئية للعضو</h2><button class="close" onclick="closePermissionsModal()">×</button></div>
+<div style="margin-top:10px" id="permissionsContainer"></div>
+<div class="modalfoot"><button type="button" class="btn primary" onclick="savePermissions()">حفظ الصلاحيات</button></div>
+</div></div>
 
 <div class="toast" id="toast"></div>
 
@@ -250,15 +309,16 @@ let tasks = [];
 let members = [];
 let dailyLogs = [];
 let currentUserId = localStorage.getItem('taskflow_user_id') || null;
+let editingMemberKey = null;
 
-// مزامنة البيانات بالسحابة
+// مزامنة البيانات
 membersRef.on('value', snapshot => {
   const data = snapshot.val();
   members = [];
   if (data) {
     Object.keys(data).forEach(key => members.push({ ...data[key], firebaseKey: key }));
   } else {
-    const def = { name: "مهيب محمد", role: "مدير النظام", type: "Manager", status: "active", pass: "123456" };
+    const def = { name: "مهيب محمد", role: "مدير النظام", type: "Manager", status: "active", pass: "123456", hiddenPages: [] };
     membersRef.push(def);
   }
   checkAutoLogin();
@@ -277,22 +337,39 @@ dailyLogsRef.on('value', snapshot => {
   dailyLogs = [];
   if (data) Object.keys(data).forEach(key => dailyLogs.push({ ...data[key], firebaseKey: key }));
   renderDailyLogs();
+  renderAdvancedReports();
 });
 
-// حفظ الجلسة وعدم الخروج عند تحديث الصفحة
 function checkAutoLogin() {
   if (currentUserId) {
     const user = members.find(m => m.firebaseKey === currentUserId);
     if (user && user.status !== "disabled") {
       document.getElementById("loginScreen").style.display = "none";
       document.getElementById("appMain").style.display = "flex";
+      applyUserPermissions(user);
     } else {
       logout();
     }
   }
 }
 
-// تسجيل الدخول بالكتابة اليدوية
+// تطبيق الصلاحيات وإخفاء/إظهار الأيقونات للموظف
+function applyUserPermissions(user) {
+  const hidden = user.hiddenPages || [];
+  const allNavs = ['dashboard', 'tasks', 'dailylog', 'calendar', 'board', 'members', 'reports', 'settings'];
+  
+  allNavs.forEach(page => {
+    const btn = document.getElementById('nav_' + page);
+    if (btn) {
+      if (user.type !== "Manager" && hidden.includes(page)) {
+        btn.style.display = "none";
+      } else {
+        btn.style.display = "flex";
+      }
+    }
+  });
+}
+
 document.getElementById("loginForm").onsubmit = (e) => {
   e.preventDefault();
   const inputName = document.getElementById("loginNameInput").value.trim().toLowerCase();
@@ -310,6 +387,7 @@ document.getElementById("loginForm").onsubmit = (e) => {
       localStorage.setItem('taskflow_user_id', currentUserId);
       document.getElementById("loginScreen").style.display = "none";
       document.getElementById("appMain").style.display = "flex";
+      applyUserPermissions(user);
       toast(`أهلاً بك 👋 ${user.name}`);
       renderAll();
     } else {
@@ -331,7 +409,7 @@ function getCurrentUser() {
   return members.find(m => m.firebaseKey === currentUserId) || members[0] || {};
 }
 
-// تصميم الشجرة التفاعلية 3D المطورة
+// رسم الشجرة 3D
 function renderTree3D(completedCount) {
   let emoji = "🌰", stage = "بذرة الإنجاز", birds = "", leaves = "";
   if (completedCount === 0) {
@@ -366,7 +444,7 @@ function renderAll() {
   const isAdmin = me.type === "Manager";
   document.querySelectorAll(".admin-only").forEach(el => el.style.display = isAdmin ? "block" : "none");
 
-  // تحديث الشجرة 3D
+  // الشجرة 3D
   const myDoneCount = tasks.filter(t => t.memberKey === me.firebaseKey && t.status === "Completed").length;
   const tree = renderTree3D(myDoneCount);
   document.getElementById("treeEmoji").textContent = tree.emoji;
@@ -380,7 +458,7 @@ function renderAll() {
   renderCalendar();
   renderBoard();
   renderMembers();
-  renderReports();
+  renderAdvancedReports();
   renderDailyLogs();
   document.getElementById("today").textContent = new Date().toLocaleDateString("ar-YE",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 }
@@ -394,19 +472,16 @@ function renderDashboard() {
   ].map(a => `<div class="card kpi"><span class="label">${a[0]}</span><strong>${a[1]}</strong><span class="trend">${a[2]}</span></div>`).join("");
 
   document.getElementById("rate").textContent = rate + "%";
-  document.getElementById("ring").style.setProperty("--p", rate + "%");
-
-  const heights = [40, 65, 45, 80, 55, 90, 70];
-  document.getElementById("chart").innerHTML = heights.map((h, i) => `<div class="bar" style="height:${h}%"><span>${["سب", "أح", "ث", "ر", "خ", "ج", "س"][i]}</span></div>`).join("");
+  document.getElementById("growthScore").textContent = completed * 55 + dailyLogs.length * 15;
 
   document.getElementById("membersTrees").innerHTML = members.map(m => {
     const c = tasks.filter(t => t.memberKey === m.firebaseKey && t.status === "Completed").length;
     const info = renderTree3D(c);
-    return `<div style="background:#161211;padding:10px;border-radius:10px;text-align:center;border:1px solid var(--line)"><div style="font-size:26px">${info.emoji}</div><b style="font-size:11px;display:block">${m.name}</b><small style="color:var(--green)">${c} إنجازات</small></div>`;
+    return `<div style="background:#111319;padding:10px;border-radius:10px;text-align:center;border:1px solid var(--line)"><div style="font-size:26px">${info.emoji}</div><b style="font-size:11px;display:block">${m.name}</b><small style="color:var(--green)">${c} إنجازات</small></div>`;
   }).join("");
 }
 
-// تسجيل ومراقبة الأعمال اليومية
+// السجل اليومي
 document.getElementById("dailyLogForm").onsubmit = (e) => {
   e.preventDefault();
   const me = getCurrentUser();
@@ -419,7 +494,7 @@ document.getElementById("dailyLogForm").onsubmit = (e) => {
       timestamp: new Date().toLocaleString('ar-YE')
     });
     document.getElementById("logText").value = "";
-    toast("تم رفع تقريرك اليومي للسحابة بنجاح!");
+    toast("تم رفع تقريرك اليومي بنجاح!");
   }
 };
 
@@ -461,6 +536,7 @@ function renderTasks() {
   }).join("") || `<tr><td colspan="8" style="text-align:center;color:var(--muted)">لا توجد مهام مطابقة</td></tr>`;
 }
 
+// التقويم و Kanban
 function renderCalendar() {
   let d = new Date(); d.setDate(1); let start = d.getDay(); let days = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
   let arr = []; for (let i = 0; i < start; i++) arr.push(`<div class="day"></div>`);
@@ -488,10 +564,11 @@ function dropTask(e) {
   if (key && st) {
     let pr = st === "Completed" ? 100 : 50;
     db.ref('tasks/' + key).update({ status: st, progress: pr });
-    toast("تم تحديث الحالة باللوحة السحابية");
+    toast("تم تحديث الحالة بالسحابة");
   }
 }
 
+// إدارة الأعضاء الكاملة وصلاحيات الإيقونات
 function renderMembers() {
   const me = getCurrentUser();
   const isAdmin = me.type === "Manager";
@@ -511,22 +588,172 @@ function renderMembers() {
       <div class="memberstats"><div><b>${userTasks.length}</b><small>إجمالي</small></div><div><b>${done}</b><small>مكتمل</small></div><div><b>${userTasks.filter(t=>t.status==='Overdue').length}</b><small>متأخر</small></div></div>
       ${isAdmin ? `
       <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn" style="font-size:11px" onclick="resetMemberPass('${m.firebaseKey}')">إعادة كلمة السر</button>
-        <button class="btn ${isBlocked ? 'primary' : 'danger'}" style="font-size:11px" onclick="toggleBlockMember('${m.firebaseKey}','${m.status}')">${isBlocked ? 'تفعيل' : 'إيقاف'}</button>
+        <button class="btn" style="font-size:11px" onclick="editMemberModal('${m.firebaseKey}')">✏️ تعديل</button>
+        <button class="btn" style="font-size:11px" onclick="openPermissionsModal('${m.firebaseKey}')">👁️ الأيقونات</button>
+        <button class="btn ${isBlocked ? 'success' : 'danger'}" style="font-size:11px" onclick="toggleBlockMember('${m.firebaseKey}','${m.status}')">${isBlocked ? 'تفعيل' : 'إيقاف'}</button>
+        <button class="btn danger" style="font-size:11px" onclick="deleteMember('${m.firebaseKey}')">🗑️ حذف</button>
       </div>` : ''}
     </div>`;
   }).join("");
 }
 
-function renderReports() {
-  const total = tasks.length, done = tasks.filter(x => x.status === "Completed").length;
-  document.getElementById("reportKpis").innerHTML = [["إجمالي المهام", total], ["المكتملة", done], ["قيد التنفيذ", tasks.filter(x => x.status === "In Progress").length], ["نسبة الإنجاز العامة", (total ? Math.round(done / total * 100) : 0) + "%"]].map(a => `<div class="card kpi"><span class="label">${a[0]}</span><strong>${a[1]}</strong></div>`).join("");
-  document.getElementById("performance").innerHTML = members.map(m => {
-    const userTasks = tasks.filter(t => t.memberKey === m.firebaseKey);
-    const r = userTasks.length ? Math.round(userTasks.filter(t => t.status === "Completed").length / userTasks.length * 100) : 0;
-    return `<div style="margin:10px 0"><div style="display:flex;justify-content:space-between"><b>${m.name}</b><span>${r}%</span></div><div class="progressbar" style="margin-top:5px"><i style="width:${r}%"></i></div></div>`;
-  }).join("");
-  document.getElementById("statusReport").innerHTML = ["Pending", "In Progress", "Completed", "Overdue"].map(s => `<div class="taskrow"><span>${s}</span><b>${tasks.filter(x => x.status === s).length}</b></div>`).join("");
+function openMemberModal() { 
+  editingMemberKey = null;
+  document.getElementById("memberModalTitle").textContent = "إضافة عضو جديد بالسحابة";
+  document.getElementById("mName").value = "";
+  document.getElementById("mRole").value = "";
+  document.getElementById("mPass").value = "123456";
+  document.getElementById("memberModal").classList.add("show"); 
+}
+
+function editMemberModal(key) {
+  const m = members.find(x => x.firebaseKey === key);
+  if(!m) return;
+  editingMemberKey = key;
+  document.getElementById("memberModalTitle").textContent = "تعديل بيانات العضو";
+  document.getElementById("mName").value = m.name;
+  document.getElementById("mRole").value = m.role;
+  document.getElementById("mType").value = m.type;
+  document.getElementById("mPass").value = m.pass || "123456";
+  document.getElementById("memberModal").classList.add("show");
+}
+
+document.getElementById("memberForm").onsubmit = (e) => {
+  e.preventDefault();
+  const data = { name: mName.value, role: mRole.value, type: mType.value, pass: mPass.value, status: "active" };
+  if(editingMemberKey) {
+    db.ref('members/' + editingMemberKey).update(data);
+    toast("تم تعديل بيانات العضو بنجاح!");
+  } else {
+    data.hiddenPages = [];
+    membersRef.push(data);
+    toast("تم إضافة العضو الجديد بالسحابة بنجاح!");
+  }
+  closeMemberModal();
+};
+
+function deleteMember(key) {
+  if (confirm("هل أنت تأكد من حذف هذا العضو نهائياً؟")) {
+    db.ref('members/' + key).remove();
+    toast("تم حذف العضو من السحابة");
+  }
+}
+
+function toggleBlockMember(key, st) { db.ref('members/' + key).update({ status: st === "disabled" ? "active" : "disabled" }); }
+
+// إدار أيقونات الصفحات
+let permMemberKey = null;
+function openPermissionsModal(key) {
+  permMemberKey = key;
+  const m = members.find(x => x.firebaseKey === key);
+  if(!m) return;
+  const hidden = m.hiddenPages || [];
+
+  const pages = [
+    { id: 'dashboard', name: 'الرئيسية' },
+    { id: 'tasks', name: 'المهام' },
+    { id: 'dailylog', name: 'السجل اليومي' },
+    { id: 'calendar', name: 'التقويم' },
+    { id: 'board', name: 'اللوحة Kanban' },
+    { id: 'reports', name: 'التقارير والتصدير' }
+  ];
+
+  document.getElementById("permissionsContainer").innerHTML = pages.map(p => `
+    <label style="display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer">
+      <input type="checkbox" id="perm_${p.id}" ${!hidden.includes(p.id) ? 'checked' : ''}>
+      <span>إظهار أيقونة صفحة <b>${p.name}</b></span>
+    </label>
+  `).join("");
+
+  document.getElementById("permissionsModal").classList.add("show");
+}
+
+function savePermissions() {
+  if(!permMemberKey) return;
+  const pages = ['dashboard', 'tasks', 'dailylog', 'calendar', 'board', 'reports'];
+  let hidden = [];
+  pages.forEach(p => {
+    const chk = document.getElementById("perm_" + p);
+    if(chk && !chk.checked) hidden.push(p);
+  });
+
+  db.ref('members/' + permMemberKey).update({ hiddenPages: hidden });
+  closePermissionsModal();
+  toast("تم حفظ صلاحيات الإيقونات بنجاح!");
+}
+
+function closePermissionsModal() { document.getElementById("permissionsModal").classList.remove("show"); }
+
+// التقارير الشاملة والفلاتر والتصدير
+function renderAdvancedReports() {
+  const memberSelect = document.getElementById("reportMemberFilter");
+  if(memberSelect && memberSelect.options.length <= 1) {
+    memberSelect.innerHTML = `<option value="all">جميع الموظفين</option>` + members.map(m => `<option value="${m.firebaseKey}">${m.name}</option>`).join("");
+  }
+
+  const type = document.getElementById("reportTypeFilter")?.value || "all";
+  const selectedMember = document.getElementById("reportMemberFilter")?.value || "all";
+
+  let combined = [];
+
+  if (type === "all" || type === "tasks") {
+    tasks.forEach(t => {
+      if (selectedMember === "all" || t.memberKey === selectedMember) {
+        const owner = members.find(m => m.firebaseKey === t.memberKey);
+        combined.push({
+          type: "مهمة",
+          member: owner ? owner.name : "غير محدد",
+          title: t.title + (t.desc ? ` (${t.desc})` : ""),
+          statusDate: t.status + " | الاستحقاق: " + (t.due || "—")
+        });
+      }
+    });
+  }
+
+  if (type === "all" || type === "dailylog") {
+    dailyLogs.forEach(l => {
+      if (selectedMember === "all" || l.memberKey === selectedMember) {
+        combined.push({
+          type: "سجل يومي",
+          member: l.memberName,
+          title: l.text,
+          statusDate: l.timestamp
+        });
+      }
+    });
+  }
+
+  const tbody = document.getElementById("reportResultBody");
+  if(!tbody) return;
+
+  tbody.innerHTML = combined.map(item => `
+    <tr>
+      <td><span class="badge ${item.type === 'مهمة' ? 'progress' : 'completed'}">${item.type}</span></td>
+      <td><b>${item.member}</b></td>
+      <td>${item.title}</td>
+      <td><small style="color:var(--muted)">${item.statusDate}</small></td>
+    </tr>
+  `).join("") || `<tr><td colspan="4" style="text-align:center;color:var(--muted)">لا توجد بيانات مطابقة للفلتر المحدد</td></tr>`;
+}
+
+// تصدير CSV / Excel
+function exportReportCSV() {
+  const table = document.getElementById("reportResultTable");
+  let csv = [];
+  for (let row of table.rows) {
+    let cols = [];
+    for (let cell of row.cells) cols.push('"' + cell.innerText.replace(/"/g, '""') + '"');
+    csv.push(cols.join(","));
+  }
+  const csvFile = new Blob(["\ufeff" + csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const downloadLink = document.createElement("a");
+  downloadLink.download = `TaskFlow_Report_${new Date().toISOString().slice(0,10)}.csv`;
+  downloadLink.href = window.URL.createObjectURL(csvFile);
+  downloadLink.style.display = "none";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  toast("تم تصدير التقرير إلى CSV / Excel بنجاح!");
 }
 
 function openCreate() {
@@ -580,19 +807,6 @@ document.getElementById("taskForm").onsubmit = (e) => {
   toast("تم حفظ المهمة بالسحابة!");
 };
 
-function openMemberModal() { document.getElementById("memberModal").classList.add("show"); }
-document.getElementById("memberForm").onsubmit = (e) => {
-  e.preventDefault();
-  membersRef.push({ name: mName.value, role: mRole.value, type: mType.value, pass: mPass.value, status: "active" });
-  closeMemberModal();
-  toast("تم إضافة العضو الجديد بالسحابة بنجاح!");
-};
-
-function toggleBlockMember(key, st) { db.ref('members/' + key).update({ status: st === "disabled" ? "active" : "disabled" }); }
-function resetMemberPass(key) {
-  const p = prompt("أدخل كلمة المرور الجديدة للعضو:", "123456");
-  if (p) db.ref('members/' + key).update({ pass: p });
-}
 function changeMyPassword() {
   const val = document.getElementById("newPassInput").value;
   if (val) { db.ref('members/' + currentUserId).update({ pass: val }); toast("تم تغيير كلمة المرور!"); }
