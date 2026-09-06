@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TaskFlow — إدارة المهام والأعضاء</title>
+<title>TaskFlow — نظام إدارة المهام الشامل</title>
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -17,91 +17,128 @@
 *{box-sizing:border-box} body{margin:0;background:var(--black);color:var(--cream);font-family:Inter,"Segoe UI",Tahoma,Arial,sans-serif}
 button,input,select,textarea{font:inherit} button{cursor:pointer}
 .app{display:flex;min-height:100vh}.sidebar{width:250px;background:#100d0c;border-left:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:20}
-.brand{display:flex;gap:12px;align-items:center;padding:5px 10px 25px}.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--bright),var(--deep));display:grid;place-items:center;font-weight:900}.brand b{font-size:18px}.brand small{color:var(--muted)}
+.brand{display:flex;gap:12px;align-items:center;padding:5px 10px 20px}.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--bright),var(--deep));display:grid;place-items:center;font-weight:900}.brand b{font-size:18px}.brand small{color:var(--muted)}
 .nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#bcb4b1;text-align:right;padding:12px;border-radius:10px;display:flex;gap:12px;align-items:center}.nav button:hover,.nav button.active{background:var(--burg);color:white}.nav i{width:22px;text-align:center;font-style:normal}
 .bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:12px}.profile{display:flex;align-items:center;gap:10px;padding:10px}.avatar{width:38px;height:38px;border-radius:50%;background:var(--bright);display:grid;place-items:center;font-weight:800}.profile small{color:var(--muted)}
 .main{width:calc(100% - 250px);margin-right:250px;padding:26px;max-width:1800px}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:24px}.top h1{margin:0 0 6px;font-size:28px}.top p{margin:0;color:var(--muted)}.actions{display:flex;gap:10px;align-items:center}.btn{border:1px solid var(--line);background:#211b1a;color:var(--cream);padding:11px 15px;border-radius:10px}.btn.primary{background:var(--red);border-color:var(--red);font-weight:700}.btn.primary:hover{background:var(--bright)}.btn.danger{background:#581c20;border-color:#b51f32;color:#fff}.iconbtn{width:42px;height:42px;padding:0}
 .page{display:none}.page.active{display:block}
 .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:17px}.kpi{position:relative;overflow:hidden}.kpi:after{content:"";position:absolute;width:70px;height:70px;border-radius:50%;background:var(--burg);opacity:.22;left:-20px;top:-20px}.kpi .label{color:var(--muted);font-size:13px}.kpi strong{display:block;font-size:28px;margin:8px 0}.trend{font-size:12px;color:var(--green)}
-.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-top:14px}.grid3{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;margin-top:14px}.card h3{margin:0 0 15px;font-size:15px}
-.tasklist{display:grid;gap:9px}.taskrow{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;justify-content:space-between;gap:10px;align-items:center}.taskrow:hover{border-color:#5b3a3f}.tasktitle{font-weight:700}.meta{color:var(--muted);font-size:12px;margin-top:4px}.badge{padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.pending{background:#3a3027;color:#e0b76b}.progress{background:#282f3a;color:#79a7e3}.completed{background:#21352d;color:#68c59c}.overdue{background:#401b22;color:#ff7182}.disabled{background:#222;color:#777}
+.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-top:14px}.grid3{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;margin-top:14px}.card h3{margin:0 0 15px;font-size:15px}.chart{height:220px;display:flex;align-items:end;gap:10px;padding:15px 5px 0}.bar{flex:1;background:linear-gradient(to top,var(--deep),var(--bright));border-radius:7px 7px 2px 2px;min-height:12px;position:relative}.bar span{position:absolute;bottom:-24px;width:100%;text-align:center;color:var(--muted);font-size:10px}.ring{width:150px;height:150px;border-radius:50%;margin:auto;background:conic-gradient(var(--bright) var(--p),#332b29 0);display:grid;place-items:center}.ring:after{content:"";width:110px;height:110px;background:var(--panel);border-radius:50%;position:absolute}.ring b{position:relative;z-index:1;font-size:28px}.tasklist{display:grid;gap:9px}.taskrow{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;justify-content:space-between;gap:10px;align-items:center}.taskrow:hover{border-color:#5b3a3f}.tasktitle{font-weight:700}.meta{color:var(--muted);font-size:12px;margin-top:4px}.badge{padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.pending{background:#3a3027;color:#e0b76b}.progress{background:#282f3a;color:#79a7e3}.completed{background:#21352d;color:#68c59c}.overdue{background:#401b22;color:#ff7182}.cancelled{background:#302a2a;color:#aaa}
 .sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.sectionhead h2{margin:0}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.input,.select,.textarea{background:#181413;color:var(--cream);border:1px solid var(--line);border-radius:9px;padding:10px 12px;outline:none}.input:focus,.select:focus,.textarea:focus{border-color:var(--bright)}.search{min-width:250px}
-.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:13px}.table{width:100%;border-collapse:collapse;min-width:900px}.table th,.table td{padding:13px 12px;border-bottom:1px solid var(--line);text-align:right}.table th{color:var(--muted);font-size:12px;background:#181413}.table td{font-size:13px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:13px}.table{width:100%;border-collapse:collapse;min-width:900px}.table th,.table td{padding:13px 12px;border-bottom:1px solid var(--line);text-align:right}.table th{color:var(--muted);font-size:12px;background:#181413}.table td{font-size:13px}.table tr:last-child td{border-bottom:0}.progressbar{height:7px;background:#302927;border-radius:999px;overflow:hidden;min-width:80px}.progressbar i{display:block;height:100%;background:var(--bright);border-radius:inherit}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.column{background:#181413;border:1px solid var(--line);border-radius:13px;padding:12px;min-height:450px}.colhead{display:flex;justify-content:space-between;margin-bottom:12px}.dropzone{min-height:380px;display:grid;align-content:start;gap:9px}.boardcard{background:#211b1a;border:1px solid var(--line);border-radius:10px;padding:12px}.boardcard[draggable=true]{cursor:grab}
 .members{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.member{display:flex;gap:12px;align-items:center}.member .avatar{flex:none}.memberinfo{flex:1}.memberstats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:12px}.memberstats div{background:#171312;border-radius:8px;padding:7px;text-align:center}.memberstats b{display:block}.memberstats small{color:var(--muted)}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.day{min-height:110px;background:#191514;border:1px solid var(--line);border-radius:8px;padding:8px}.daynum{font-size:12px;color:var(--muted)}.event{font-size:10px;background:var(--burg);padding:5px;border-radius:5px;margin-top:7px;overflow:hidden;cursor:pointer}
 .modalbg{display:none;position:fixed;inset:0;background:#000b;z-index:50;align-items:center;justify-content:center;padding:20px}.modalbg.show{display:flex}.modal{width:min(720px,100%);max-height:90vh;overflow:auto;background:#1b1716;border:1px solid #473536;border-radius:16px;padding:22px}.modalhead{display:flex;justify-content:space-between;align-items:center}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;color:var(--muted)}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
 .toast{position:fixed;left:24px;bottom:24px;background:#241c1b;border:1px solid #58363c;padding:12px 16px;border-radius:10px;z-index:100;transform:translateY(120px);transition:.25s}.toast.show{transform:translateY(0)}
 .mobiletop{display:none}.close{border:0;background:transparent;color:var(--muted);font-size:24px}
 
 /* شجرة الإنجاز التفاعلية */
-.tree-widget{background:linear-gradient(180deg, #1f271b 0%, #171312 100%);border:1px solid #36522c;border-radius:12px;padding:14px;text-align:center;margin-bottom:15px;position:relative;overflow:hidden}
-.tree-icon{font-size:42px;transition:all 0.5s ease;display:inline-block;filter:drop-shadow(0 0 10px rgba(67, 181, 129, 0.3))}
-.tree-level{font-size:12px;color:var(--green);font-weight:700;margin-top:4px}
-.progressbar{height:7px;background:#302927;border-radius:999px;overflow:hidden;min-width:80px;margin-top:6px}.progressbar i{display:block;height:100%;background:var(--green);border-radius:inherit}
+.tree-widget{background:linear-gradient(180deg, #1f271b 0%, #171312 100%);border:1px solid #36522c;border-radius:12px;padding:12px;text-align:center;margin-bottom:12px}
+.tree-icon{font-size:38px;transition:all 0.5s ease;display:inline-block;filter:drop-shadow(0 0 8px rgba(67, 181, 129, 0.3))}
+
+/* واجهة تسجيل الدخول */
+#loginScreen{position:fixed;inset:0;background:#0d0a0a;z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:#181413;border:1px solid #421019;border-radius:16px;padding:30px;width:min(420px,100%);box-shadow:0 10px 30px #0008}
 
 @media(max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}.grid2,.grid3{grid-template-columns:1fr}.members{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:760px){.sidebar{transform:translateX(100%);transition:.2s;width:280px}.sidebar.open{transform:translateX(0)}.main{width:100%;margin:0;padding:16px}.mobiletop{display:flex;justify-content:space-between;margin-bottom:14px}.kpis{grid-template-columns:repeat(2,1fr)}.members{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.actions{width:100%}.search{min-width:0;width:100%}.formgrid{grid-template-columns:1fr}}
+@media(max-width:760px){.sidebar{transform:translateX(100%);transition:.2s;width:280px}.sidebar.open{transform:translateX(0)}.main{width:100%;margin:0;padding:16px}.mobiletop{display:flex;justify-content:space-between;margin-bottom:14px}.kpis{grid-template-columns:repeat(2,1fr)}.members,.board{grid-template-columns:1fr}.calendar{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start;flex-direction:column}.actions{width:100%}.search{min-width:0;width:100%}.formgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- شاشة تسجيل الدخول -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:20px">
+      <div class="logo" style="margin:auto;width:50px;height:50px;font-size:22px">T</div>
+      <h2 style="margin:10px 0 5px">تسجيل الدخول إلى TaskFlow</h2>
+      <p style="color:var(--muted);font-size:13px;margin:0">يرجى اختيار حسابك وإدخال كلمة المرور</p>
+    </div>
+    <form id="loginForm">
+      <div class="field" style="margin-bottom:14px">
+        <label>العضو المسجل</label>
+        <select id="loginUserSelect" class="select" required></select>
+      </div>
+      <div class="field" style="margin-bottom:20px">
+        <label>كلمة المرور</label>
+        <input type="password" id="loginPassInput" class="input" placeholder="أدخل كلمة المرور" required>
+      </div>
+      <button class="btn primary" style="width:100%;padding:12px">تسجيل الدخول</button>
+    </form>
+  </div>
+</div>
+
+<div class="app" id="appMain" style="display:none">
 <aside class="sidebar" id="sidebar">
   <div class="brand"><div class="logo">T</div><div><b>TaskFlow</b><br><small>تطبيق إدارة المهام</small></div></div>
   
-  <!-- شجرة النمو التفاعلية لـ المستخدم الحالي -->
-  <div class="tree-widget" id="myTreeWidget">
+  <!-- شجرة النمو التفاعلية -->
+  <div class="tree-widget">
     <div class="tree-icon" id="treeEmoji">🌱</div>
-    <div style="font-weight:bold;font-size:13px;" id="treeStage">شتلة الإنجاز</div>
-    <div class="tree-level" id="treeLevel">مكتمل: 0 مهمة</div>
-    <div class="progressbar"><i id="treeBar" style="width:0%"></i></div>
+    <div style="font-weight:bold;font-size:13px" id="treeStage">شتلة الإنجاز</div>
+    <small style="color:var(--green);display:block;margin-top:2px" id="treeLevel">مكتمل: 0 مهمة</small>
   </div>
 
   <nav class="nav">
-    <button class="active" data-page="dashboard"><i>⌂</i><span>الرئيسية</span></button>
-    <button data-page="tasks"><i>✓</i><span>المهام</span></button>
-    <button data-page="members"><i>◉</i><span>الأعضاء والإدارة</span></button>
-    <button data-page="settings"><i>⚙</i><span>الإعدادات الحساب</span></button>
+    <button class="active" data-page="dashboard"><i>⌂</i><span>Dashboard</span></button>
+    <button data-page="tasks"><i>✓</i><span>Tasks</span></button>
+    <button data-page="calendar"><i>▦</i><span>Calendar</span></button>
+    <button data-page="board"><i>▤</i><span>Board</span></button>
+    <button data-page="members"><i>◉</i><span>Members</span></button>
+    <button data-page="reports"><i>◫</i><span>Reports</span></button>
+    <button data-page="notifications"><i>♢</i><span>Notifications</span></button>
+    <button data-page="settings"><i>⚙</i><span>Settings</span></button>
   </nav>
   <div class="bottom">
-    <div class="profile">
-      <div class="avatar" id="myAvatar">م</div>
-      <div><b id="myNavName">مهيب محمد</b><br><small id="myNavRole">مدير النظام</small></div>
-    </div>
+    <div class="profile"><div class="avatar" id="myAvatar">م</div><div><b id="myNavName">...</b><br><small id="myNavRole">...</small></div></div>
+    <button class="nav" style="width:100%" onclick="logout()"><span>↪ Logout</span></button>
   </div>
 </aside>
 
 <main class="main">
-<div class="mobiletop"><button class="btn iconbtn" onclick="toggleMenu()">☰</button></div>
+<div class="mobiletop"><button class="btn iconbtn" onclick="toggleMenu()">☰</button><button class="btn iconbtn" onclick="toggleLang()">ع</button></div>
 
 <section id="dashboard" class="page active">
-<div class="top"><div><h1 id="greeting">أهلاً بك 👋</h1><p id="today"></p></div><div class="actions"><button class="btn primary admin-only" onclick="openCreate()">＋ إنشاء مهمة</button></div></div>
+<div class="top"><div><h1 id="greeting">مساء الخير 👋</h1><p id="today"></p></div><div class="actions"><button class="btn iconbtn" onclick="toggleLang()">ع/EN</button><button class="btn primary admin-only" onclick="openCreate()">＋ إنشاء مهمة</button></div></div>
 <div class="kpis" id="kpis"></div>
 <div class="grid2">
-  <div class="card"><h3>شجرة نمو الفريق 🌱</h3><p style="color:var(--muted);font-size:13px">كلما أنجز العضو مهاماً أكثر، تنمو شجرته التفاعلية لتصل إلى شجرة مثمرة!</p><div id="membersTrees" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:15px"></div></div>
-  <div class="card"><h3>النشاط الأخير</h3><div class="tasklist" id="activity"></div></div>
+  <div class="card"><h3>المهام خلال الأسبوع</h3><div class="chart" id="chart"></div></div>
+  <div class="card"><h3>معدل الإنجاز العام</h3><div class="ring" id="ring"><b id="rate">0%</b></div></div>
+</div>
+<div class="grid2" style="margin-top:14px">
+  <div class="card"><h3>شجرة نمو الأعضاء 🌱</h3><div id="membersTrees" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:10px"></div></div>
+  <div class="card"><h3>النشاط الأخير</h3><div class="timeline" id="activity"></div></div>
+</div>
+<div class="grid2" style="margin-top:14px">
+  <div class="card"><h3>مهام اليوم</h3><div class="tasklist" id="todayTasks"></div></div>
+  <div class="card"><h3>المواعيد القادمة</h3><div class="tasklist" id="upcoming"></div></div>
 </div>
 </section>
 
 <section id="tasks" class="page">
 <div class="sectionhead"><h2>إدارة المهام</h2><button class="btn primary admin-only" onclick="openCreate()">＋ إنشاء مهمة</button></div>
 <div class="card">
-<div class="toolbar" style="margin-bottom:12px"><input id="search" class="input search" placeholder="ابحث عن مهمة..." oninput="renderTasks()"><select id="statusFilter" class="select" onchange="renderTasks()"><option value="">كل الحالات</option><option>Pending</option><option>In Progress</option><option>Completed</option><option>Overdue</option></select></div>
-<div class="tablewrap"><table class="table"><thead><tr><th>المهمة</th><th>المسند إليه</th><th>الأولوية</th><th>الحالة</th><th>الإنجاز</th><th>إجراء</th></tr></thead><tbody id="taskTable"></tbody></table></div>
+<div class="toolbar" style="margin-bottom:12px"><input id="search" class="input search" placeholder="ابحث عن مهمة..." oninput="renderTasks()"><select id="statusFilter" class="select" onchange="renderTasks()"><option value="">كل الحالات</option><option>Pending</option><option>In Progress</option><option>Completed</option><option>Overdue</option><option>Cancelled</option></select><select id="priorityFilter" class="select" onchange="renderTasks()"><option value="">كل الأولويات</option><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+<div class="tablewrap"><table class="table"><thead><tr><th>المهمة</th><th>المسند إليه</th><th>الأولوية</th><th>الحالة</th><th>البداية</th><th>الاستحقاق</th><th>الإنجاز</th><th>إجراء</th></tr></thead><tbody id="taskTable"></tbody></table></div>
 </div></section>
 
-<section id="members" class="page">
-<div class="sectionhead"><h2>إدارة الأعضاء والصلاحيات</h2><button class="btn primary admin-only" onclick="openMemberModal()">＋ إضافة عضو جديد</button></div>
-<div class="members" id="membersGrid"></div>
-</section>
+<section id="calendar" class="page"><div class="sectionhead"><h2>التقويم</h2><div class="toolbar"><button class="btn">اليوم</button><button class="btn">أسبوع</button><button class="btn primary">شهر</button></div></div><div class="card"><div class="calendar" id="calendarGrid"></div></div></section>
+
+<section id="board" class="page"><div class="sectionhead"><h2>Board (سحب وإفلات)</h2><button class="btn primary admin-only" onclick="openCreate()">＋ إنشاء مهمة</button></div><div class="board" id="boardGrid"></div></section>
+
+<section id="members" class="page"><div class="sectionhead"><h2>أعضاء الفريق والإدارة</h2><button class="btn primary admin-only" onclick="openMemberModal()">＋ إضافة عضو جديد</button></div><div class="members" id="membersGrid"></div></section>
+
+<section id="reports" class="page"><div class="sectionhead"><h2>التقارير والأداء</h2><div class="toolbar"><button class="btn" onclick="exportCSV()">Export CSV</button></div></div><div class="kpis" id="reportKpis"></div><div class="grid2"><div class="card"><h3>الأداء حسب العضو</h3><div id="performance"></div></div><div class="card"><h3>توزيع الحالات</h3><div id="statusReport"></div></div></div></section>
+
+<section id="notifications" class="page"><div class="sectionhead"><h2>مركز الإشعارات</h2><button class="btn" onclick="toast('تم تعليم الإشعارات كمقروءة')">تعليم الكل كمقروء</button></div><div class="card tasklist" id="notificationsList"></div></section>
 
 <section id="settings" class="page">
-<div class="sectionhead"><h2>تغيير كلمة المرور والخيارات</h2></div>
+<div class="sectionhead"><h2>إعدادات الحساب والحماية</h2></div>
 <div class="card" style="max-width:500px">
   <h3>تغيير كلمة المرور الخاصة بك</h3>
-  <div class="field" style="margin-bottom:12px"><label>كلمة المرور الجديدة</label><input type="password" id="newPassInput" class="input" placeholder="اكتب كلمة المرور الجديدة"></div>
-  <button class="btn primary" onclick="changeMyPassword()">تحديث كلمة المرور</button>
-  <hr style="border-color:var(--line);margin:20px 0">
-  <h3>التبديل بين الحسابات للتجربة</h3>
-  <div class="field"><label>اختر العضو المسجل للتبديل إليه:</label><select id="userSwitchSelect" class="select" onchange="switchCurrentUser(this.value)"></select></div>
+  <div class="field" style="margin-bottom:12px"><label>كلمة المرور الجديدة</label><input type="password" id="newPassInput" class="input" placeholder="أدخل كلمة المرور الجديدة"></div>
+  <button class="btn primary" onclick="changeMyPassword()">حفظ كلمة المرور الجديدة</button>
 </div>
 </section>
 </main></div>
@@ -114,24 +151,26 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 <div class="formgrid">
 <div class="field full"><label>اسم المهمة</label><input id="fTitle" class="input" required></div>
 <div class="field full"><label>الوصف</label><textarea id="fDesc" class="textarea" rows="2"></textarea></div>
-<div class="field"><label>العضو المسند إليه</label><select id="fMember" class="select"></select></div>
+<div class="field"><label>المشارك</label><select id="fMember" class="select"></select></div>
 <div class="field"><label>الأولوية</label><select id="fPriority" class="select"><option>Low</option><option selected>Medium</option><option>High</option><option>Critical</option></select></div>
-<div class="field"><label>الحالة</label><select id="fStatus" class="select"><option>Pending</option><option>In Progress</option><option>Completed</option></select></div>
+<div class="field"><label>تاريخ البداية</label><input id="fStartDate" type="date" class="input" required></div>
+<div class="field"><label>تاريخ الاستحقاق</label><input id="fDueDate" type="date" class="input" required></div>
+<div class="field"><label>الحالة</label><select id="fStatus" class="select"><option>Pending</option><option>In Progress</option><option>Completed</option><option>Cancelled</option></select></div>
 <div class="field"><label>نسبة الإنجاز %</label><input id="fProgress" type="number" min="0" max="100" class="input"></div>
 </div>
-<div class="modalfoot"><button type="button" class="btn" onclick="closeModal()">إلغاء</button><button class="btn primary">حفظ</button></div>
+<div class="modalfoot"><button type="button" class="btn" onclick="closeModal()">إلغاء</button><button class="btn primary">حفظ المهمة</button></div>
 </form></div></div>
 
-<!-- نافذة إضافة/تعديل عضو -->
+<!-- نافذة إضافة عضو جديد بالسحابة -->
 <div class="modalbg" id="memberModal">
 <div class="modal">
-<div class="modalhead"><h2 id="memberModalTitle">إضافة عضو جديد</h2><button class="close" onclick="closeMemberModal()">×</button></div>
+<div class="modalhead"><h2>إضافة عضو جديد بالسحابة</h2><button class="close" onclick="closeMemberModal()">×</button></div>
 <form id="memberForm">
 <div class="formgrid">
-<div class="field full"><label>الاسم الكامل</label><input id="mName" class="input" required placeholder="مثال: علي خالد"></div>
+<div class="field full"><label>الاسم الكامل</label><input id="mName" class="input" required placeholder="مثال: أحمد علي"></div>
 <div class="field"><label>الدور الوظيفي</label><input id="mRole" class="input" required placeholder="مثال: ممثل ميداني"></div>
 <div class="field"><label>نوع الصلاحية</label><select id="mType" class="select"><option value="Member">عضو (تنفيذ فقط)</option><option value="Manager">مدير نظام (صلاحيات كاملة)</option></select></div>
-<div class="field full"><label>كلمة المرور الحساب</label><input id="mPass" type="text" class="input" required value="123456"></div>
+<div class="field full"><label>كلمة المرور الافتراضية</label><input id="mPass" type="text" class="input" required value="123456"></div>
 </div>
 <div class="modalfoot"><button type="button" class="btn" onclick="closeMemberModal()">إلغاء</button><button class="btn primary">حفظ العضو بالسحابة</button></div>
 </form></div></div>
@@ -139,7 +178,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 <div class="toast" id="toast"></div>
 
 <script>
-// إعدادات Firebase الخاصة بك
+// إعدادات Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDtv81cLSHqiGVL0-dpoygw-q-v_0VOyS8",
   authDomain: "taskflow-app-28d87.firebaseapp.com",
@@ -155,20 +194,22 @@ const membersRef = db.ref('members');
 
 let tasks = [];
 let members = [];
-let currentUserId = null; // سيتم تحديده لاحقاً
+let currentUserId = null;
+let activities = ["تم تسجيل الدخول للنظام"];
+let notifications = ["أهلاً بك في نظام TaskFlow السحابي"];
 
-// المزامنة مع السحابة للأعضاء والمهام
+// مزامنة السحابة
 membersRef.on('value', snapshot => {
   const data = snapshot.val();
   members = [];
   if (data) {
     Object.keys(data).forEach(key => members.push({ ...data[key], firebaseKey: key }));
   } else {
-    // إضافة مدير النظام الافتراضي لو كانت القاعدة فارغة
-    const defaultManager = { name: "مهيب محمد", role: "مدير النظام", type: "Manager", status: "active", pass: "123456" };
-    membersRef.push(defaultManager);
+    // إدراج المدير الافتراضي
+    const def = { name: "مهيب محمد", role: "مدير النظام", type: "Manager", status: "active", pass: "123456" };
+    membersRef.push(def);
   }
-  if (!currentUserId && members.length) currentUserId = members[0].firebaseKey;
+  updateLoginOptions();
   renderAll();
 });
 
@@ -179,81 +220,159 @@ tasksRef.on('value', snapshot => {
   renderAll();
 });
 
+function updateLoginOptions() {
+  document.getElementById("loginUserSelect").innerHTML = members.map(m => `<option value="${m.firebaseKey}">${m.name} (${m.type==='Manager'?'مدير':'عضو'})</option>`).join("");
+}
+
+// تسجيل الدخول
+document.getElementById("loginForm").onsubmit = (e) => {
+  e.preventDefault();
+  const selectedKey = document.getElementById("loginUserSelect").value;
+  const pass = document.getElementById("loginPassInput").value;
+  const user = members.find(m => m.firebaseKey === selectedKey);
+
+  if (user) {
+    if (user.status === "disabled") {
+      alert("هذا الحساب معطل حالياً من مدير النظام!");
+      return;
+    }
+    if (user.pass === pass) {
+      currentUserId = selectedKey;
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("appMain").style.display = "flex";
+      toast(`أهلاً بك 👋 ${user.name}`);
+      renderAll();
+    } else {
+      alert("كلمة المرور غير صحيحة!");
+    }
+  }
+};
+
 function getCurrentUser() {
   return members.find(m => m.firebaseKey === currentUserId) || members[0] || {};
 }
 
-function renderTree(completedCount) {
-  if (completedCount === 0) return { emoji: "🌰", stage: "بذرة الإنجاز" };
-  if (completedCount <= 2) return { emoji: "🌱", stage: "شتلة صغيرة" };
-  if (completedCount <= 5) return { emoji: "🌿", stage: "غصن واعد" };
-  if (completedCount <= 9) return { emoji: "🪴", stage: "شجرة نامية" };
+function renderTree(count) {
+  if (count === 0) return { emoji: "🌰", stage: "بذرة الإنجاز" };
+  if (count <= 2) return { emoji: "🌱", stage: "شتلة صغيرة" };
+  if (count <= 5) return { emoji: "🌿", stage: "غصن واعد" };
+  if (count <= 9) return { emoji: "🪴", stage: "شجرة نامية" };
   return { emoji: "🌳", stage: "شجرة مثمرة" };
 }
 
 function renderAll() {
   const me = getCurrentUser();
-  if(!me) return;
+  if(!me || !currentUserId) return;
 
-  // تحديث بيانات الشخص الحالي
-  document.getElementById("myNavName").textContent = me.name || "—";
+  document.getElementById("myNavName").textContent = me.name;
   document.getElementById("myNavRole").textContent = me.type === "Manager" ? "مدير النظام" : me.role;
-  document.getElementById("myAvatar").textContent = (me.name || "M")[0];
-  
-  // صلاحيات الشاشة
+  document.getElementById("myAvatar").textContent = me.name[0];
+
   const isAdmin = me.type === "Manager";
   document.querySelectorAll(".admin-only").forEach(el => el.style.display = isAdmin ? "inline-block" : "none");
 
-  // تحديث الشجرة الشخصية
-  const myDoneTasks = tasks.filter(t => t.memberKey === me.firebaseKey && t.status === "Completed").length;
-  const treeInfo = renderTree(myDoneTasks);
-  document.getElementById("treeEmoji").textContent = treeInfo.emoji;
-  document.getElementById("treeStage").textContent = treeInfo.stage;
-  document.getElementById("treeLevel").textContent = `مكتمل: ${myDoneTasks} مهمة`;
-  document.getElementById("treeBar").style.width = Math.min(100, myDoneTasks * 10) + "%";
-
-  // إعدادات تبديل الحسابات
-  document.getElementById("userSwitchSelect").innerHTML = members.map(m => `<option value="${m.firebaseKey}" ${m.firebaseKey===currentUserId?'selected':''}>${m.name} (${m.type==='Manager'?'مدير':'عضو'})</option>`).join("");
+  // شجرة العضو الحالي
+  const myDoneCount = tasks.filter(t => t.memberKey === me.firebaseKey && t.status === "Completed").length;
+  const tree = renderTree(myDoneCount);
+  document.getElementById("treeEmoji").textContent = tree.emoji;
+  document.getElementById("treeStage").textContent = tree.stage;
+  document.getElementById("treeLevel").textContent = `مكتمل: ${myDoneCount} مهمة`;
 
   renderDashboard();
   renderTasks();
+  renderCalendar();
+  renderBoard();
   renderMembers();
+  renderReports();
+  renderNotifications();
   document.getElementById("today").textContent = new Date().toLocaleDateString("ar-YE",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
 }
 
 function renderDashboard() {
-  const total = tasks.length, done = tasks.filter(t => t.status === "Completed").length;
+  const total = tasks.length, completed = tasks.filter(x => x.status === "Completed").length;
+  const rate = total ? Math.round(completed / total * 100) : 0;
+  
   document.getElementById("kpis").innerHTML = [
-    ["إجمالي المهام", total], ["المهام المكتملة", done], ["قيد التنفيذ", tasks.filter(t => t.status === "In Progress").length], ["الأعضاء", members.length]
-  ].map(a => `<div class="card kpi"><span class="label">${a[0]}</span><strong>${a[1]}</strong></div>`).join("");
+    ["إجمالي المهام", total, "↗ الكل"], ["مكتملة", completed, "↗ إنجاز"], ["قيد التنفيذ", tasks.filter(x => x.status === "In Progress").length, "نشطة"], ["لم تبدأ", tasks.filter(x => x.status === "Pending").length, "مُنتظرة"], ["متأخرة", tasks.filter(x => x.status === "Overdue").length, "تنبيه"]
+  ].map(a => `<div class="card kpi"><span class="label">${a[0]}</span><strong>${a[1]}</strong><span class="trend">${a[2]}</span></div>`).join("");
 
-  // أشجار جميع الأعضاء
+  document.getElementById("rate").textContent = rate + "%";
+  document.getElementById("ring").style.setProperty("--p", rate + "%");
+
+  const heights = [35, 55, 42, 75, 60, 88, 68];
+  document.getElementById("chart").innerHTML = heights.map((h, i) => `<div class="bar" style="height:${h}%"><span>${["سب", "أح", "ث", "ر", "خ", "ج", "س"][i]}</span></div>`).join("");
+
   document.getElementById("membersTrees").innerHTML = members.map(m => {
-    const count = tasks.filter(t => t.memberKey === m.firebaseKey && t.status === "Completed").length;
-    const info = renderTree(count);
-    return `<div style="background:#181413;padding:10px;border-radius:10px;text-align:center;border:1px solid var(--line)"><div style="font-size:26px">${info.emoji}</div><b style="font-size:12px;display:block">${m.name}</b><small style="color:var(--green)">${count} إنجازات</small></div>`;
+    const c = tasks.filter(t => t.memberKey === m.firebaseKey && t.status === "Completed").length;
+    const info = renderTree(c);
+    return `<div style="background:#181413;padding:10px;border-radius:10px;text-align:center;border:1px solid var(--line)"><div style="font-size:24px">${info.emoji}</div><b style="font-size:11px;display:block">${m.name}</b><small style="color:var(--green)">${c} إنجاز</small></div>`;
   }).join("");
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+  document.getElementById("todayTasks").innerHTML = tasks.filter(x => x.due && x.due.startsWith(todayStr)).slice(0, 4).map(taskMini).join("") || `<div style="color:var(--muted);padding:10px">لا توجد مهام اليوم</div>`;
+  document.getElementById("upcoming").innerHTML = tasks.filter(x => x.status !== "Completed").slice(0, 4).map(taskMini).join("") || `<div style="color:var(--muted);padding:10px">لا توجد مواعيد قادمة</div>`;
+  document.getElementById("activity").innerHTML = activities.slice(0, 5).map((a, i) => `<div style="border-right:2px solid var(--burg);padding-right:8px;margin-bottom:8px"><b>${a}</b></div>`).join("");
+}
+
+function taskMini(x) {
+  const m = members.find(a => a.firebaseKey === x.memberKey);
+  return `<div class="taskrow" onclick="openEditTask('${x.firebaseKey}')"><div><div class="tasktitle">${x.title}</div><div class="meta">${m ? m.name : '—'}</div></div><span class="badge ${x.status.toLowerCase()}">${x.status}</span></div>`;
 }
 
 function renderTasks() {
   const me = getCurrentUser();
   const isAdmin = me.type === "Manager";
   let q = (document.getElementById("search")?.value || "").toLowerCase();
-  
-  let filtered = tasks.filter(t => isAdmin || t.memberKey === me.firebaseKey);
-  if(q) filtered = filtered.filter(t => t.title.toLowerCase().includes(q));
+  let s = document.getElementById("statusFilter")?.value || "";
 
-  document.getElementById("taskTable").innerHTML = filtered.map(t => {
-    const owner = members.find(m => m.firebaseKey === t.memberKey);
+  let list = tasks.filter(t => isAdmin || t.memberKey === me.firebaseKey);
+  if (q) list = list.filter(t => t.title.toLowerCase().includes(q));
+  if (s) list = list.filter(t => t.status === s);
+
+  document.getElementById("taskTable").innerHTML = list.map(x => {
+    const owner = members.find(m => m.firebaseKey === x.memberKey);
     return `<tr>
-      <td><b>${t.title}</b><br><small style="color:var(--muted)">${t.desc||""}</small></td>
+      <td><b>${x.title}</b><br><small style="color:var(--muted)">${x.desc||""}</small></td>
       <td>${owner ? owner.name : "—"}</td>
-      <td>${t.priority}</td>
-      <td><span class="badge ${t.status.toLowerCase()}">${t.status}</span></td>
-      <td>${t.progress||0}%</td>
-      <td><button class="btn" onclick="openEditTask('${t.firebaseKey}')">تحديث</button></td>
+      <td>${x.priority}</td>
+      <td><span class="badge ${x.status.toLowerCase()}">${x.status}</span></td>
+      <td>${x.start||"—"}</td>
+      <td>${x.due||"—"}</td>
+      <td><div class="progressbar"><i style="width:${x.progress||0}%"></i></div><small>${x.progress||0}%</small></td>
+      <td><button class="btn" onclick="openEditTask('${x.firebaseKey}')">تحديث</button></td>
     </tr>`;
-  }).join("") || `<tr><td colspan="6" style="text-align:center;color:var(--muted)">لا توجد مهام</td></tr>`;
+  }).join("") || `<tr><td colspan="8" style="text-align:center;color:var(--muted)">لا توجد مهام مطابقة</td></tr>`;
+}
+
+function renderCalendar() {
+  let d = new Date(); d.setDate(1); let start = d.getDay(); let days = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  let arr = []; for (let i = 0; i < start; i++) arr.push(`<div class="day"></div>`);
+  for (let n = 1; n <= days; n++) {
+    let ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(n).padStart(2, "0")}`;
+    let ev = tasks.filter(x => x.due && x.due.startsWith(ds));
+    arr.push(`<div class="day"><div class="daynum">${n}</div>${ev.map(x => `<div class="event" onclick="openEditTask('${x.firebaseKey}')">${x.title}</div>`).join("")}</div>`);
+  }
+  document.getElementById("calendarGrid").innerHTML = arr.join("");
+}
+
+function renderBoard() {
+  const cols = [["Pending", "لم تبدأ"], ["In Progress", "قيد التنفيذ"], ["Completed", "مكتملة"]];
+  document.getElementById("boardGrid").innerHTML = cols.map(([st, label]) => {
+    const colTasks = tasks.filter(x => x.status === st);
+    return `<div class="column"><div class="colhead"><b>${label}</b><span class="badge">${colTasks.length}</span></div><div class="dropzone" data-status="${st}" ondragover="event.preventDefault()" ondrop="dropTask(event)">${colTasks.map(x => {
+      const owner = members.find(m => m.firebaseKey === x.memberKey);
+      return `<div class="boardcard" draggable="true" ondragstart="event.dataTransfer.setData('text/plain','${x.firebaseKey}')"><b>${x.title}</b><div class="meta">${owner ? owner.name : "—"}</div><div class="progressbar" style="margin-top:8px"><i style="width:${x.progress||0}%"></i></div></div>`;
+    }).join("")}</div></div>`;
+  }).join("");
+}
+
+function dropTask(e) {
+  let key = e.dataTransfer.getData("text/plain"), st = e.currentTarget.dataset.status;
+  if (key && st) {
+    let pr = st === "Completed" ? 100 : 50;
+    db.ref('tasks/' + key).update({ status: st, progress: pr });
+    toast("تم تحديث الحالة باللوحة السحابية");
+  }
 }
 
 function renderMembers() {
@@ -262,44 +381,66 @@ function renderMembers() {
 
   document.getElementById("membersGrid").innerHTML = members.map(m => {
     const isBlocked = m.status === "disabled";
+    const userTasks = tasks.filter(t => t.memberKey === m.firebaseKey);
+    const done = userTasks.filter(t => t.status === "Completed").length;
     return `<div class="card">
       <div class="member">
         <div class="avatar">${m.name[0]}</div>
         <div class="memberinfo">
-          <b>${m.name} ${isBlocked?'<small style="color:var(--red)">(معطل)</small>':''}</b><br>
+          <b>${m.name} ${isBlocked ? '<small style="color:var(--red)">(معطل)</small>' : ''}</b><br>
           <small style="color:var(--muted)">${m.role} · <b style="color:var(--amber)">${m.type}</b></small>
         </div>
       </div>
+      <div class="memberstats"><div><b>${userTasks.length}</b><small>إجمالي</small></div><div><b>${done}</b><small>مكتمل</small></div><div><b>${userTasks.filter(t=>t.status==='Overdue').length}</b><small>متأخر</small></div></div>
       ${isAdmin ? `
       <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn" style="font-size:11px" onclick="resetMemberPass('${m.firebaseKey}')">إعادة كلمة السر</button>
-        <button class="btn ${isBlocked?'primary':'danger'}" style="font-size:11px" onclick="toggleBlockMember('${m.firebaseKey}','${m.status}')">${isBlocked?'تفعيل':'إيقاف'}</button>
+        <button class="btn ${isBlocked ? 'primary' : 'danger'}" style="font-size:11px" onclick="toggleBlockMember('${m.firebaseKey}','${m.status}')">${isBlocked ? 'تفعيل' : 'إيقاف'}</button>
       </div>` : ''}
     </div>`;
   }).join("");
 }
 
-// إنشاء وتعديل المهام
+function renderReports() {
+  const total = tasks.length, done = tasks.filter(x => x.status === "Completed").length;
+  document.getElementById("reportKpis").innerHTML = [["Total Tasks", total], ["Completed", done], ["In Progress", tasks.filter(x => x.status === "In Progress").length], ["Completion Rate", (total ? Math.round(done / total * 100) : 0) + "%"]].map(a => `<div class="card kpi"><span class="label">${a[0]}</span><strong>${a[1]}</strong></div>`).join("");
+  document.getElementById("performance").innerHTML = members.map(m => {
+    const userTasks = tasks.filter(t => t.memberKey === m.firebaseKey);
+    const r = userTasks.length ? Math.round(userTasks.filter(t => t.status === "Completed").length / userTasks.length * 100) : 0;
+    return `<div style="margin:10px 0"><div style="display:flex;justify-content:space-between"><b>${m.name}</b><span>${r}%</span></div><div class="progressbar" style="margin-top:5px"><i style="width:${r}%"></i></div></div>`;
+  }).join("");
+  document.getElementById("statusReport").innerHTML = ["Pending", "In Progress", "Completed", "Overdue"].map(s => `<div class="taskrow"><span>${s}</span><b>${tasks.filter(x => x.status === s).length}</b></div>`).join("");
+}
+
+function renderNotifications() {
+  document.getElementById("notificationsList").innerHTML = notifications.map((n, i) => `<div class="taskrow"><div><b>${n}</b></div><span class="badge pending">جديد</span></div>`).join("");
+}
+
 function openCreate() {
   document.getElementById("modalTitle").textContent = "إنشاء مهمة جديدة";
   document.getElementById("fMember").innerHTML = members.map(m => `<option value="${m.firebaseKey}">${m.name}</option>`).join("");
   document.getElementById("fTitle").value = "";
   document.getElementById("fDesc").value = "";
   document.getElementById("fProgress").value = 0;
+  let iso = new Date().toISOString().slice(0, 10);
+  document.getElementById("fStartDate").value = iso;
+  document.getElementById("fDueDate").value = iso;
   document.getElementById("taskForm").dataset.edit = "";
   document.getElementById("modal").classList.add("show");
 }
 
 function openEditTask(key) {
   const t = tasks.find(x => x.firebaseKey === key);
-  if(!t) return;
+  if (!t) return;
   document.getElementById("modalTitle").textContent = "تحديث المهمة";
-  document.getElementById("fMember").innerHTML = members.map(m => `<option value="${m.firebaseKey}" ${m.firebaseKey===t.memberKey?'selected':''}>${m.name}</option>`).join("");
+  document.getElementById("fMember").innerHTML = members.map(m => `<option value="${m.firebaseKey}" ${m.firebaseKey === t.memberKey ? 'selected' : ''}>${m.name}</option>`).join("");
   document.getElementById("fTitle").value = t.title;
   document.getElementById("fDesc").value = t.desc || "";
-  document.getElementById("fPriority").value = t.priority;
+  document.getElementById("fPriority").value = t.priority || "Medium";
   document.getElementById("fStatus").value = t.status;
   document.getElementById("fProgress").value = t.progress || 0;
+  document.getElementById("fStartDate").value = t.start || new Date().toISOString().slice(0, 10);
+  document.getElementById("fDueDate").value = t.due || new Date().toISOString().slice(0, 10);
   document.getElementById("taskForm").dataset.edit = key;
   document.getElementById("modal").classList.add("show");
 }
@@ -313,6 +454,8 @@ document.getElementById("taskForm").onsubmit = (e) => {
     memberKey: fMember.value,
     priority: fPriority.value,
     status: fStatus.value,
+    start: fStartDate.value,
+    due: fDueDate.value,
     progress: +fProgress.value
   };
   if (data.status === "Completed") data.progress = 100;
@@ -324,58 +467,40 @@ document.getElementById("taskForm").onsubmit = (e) => {
   toast("تم حفظ المهمة بالسحابة!");
 };
 
-// إدراج عضو جديد بالسحابة
-function openMemberModal() {
-  document.getElementById("memberModal").classList.add("show");
-}
-
+function openMemberModal() { document.getElementById("memberModal").classList.add("show"); }
 document.getElementById("memberForm").onsubmit = (e) => {
   e.preventDefault();
-  const newMember = {
-    name: mName.value,
-    role: mRole.value,
-    type: mType.value,
-    pass: mPass.value,
-    status: "active"
-  };
-  membersRef.push(newMember);
+  membersRef.push({ name: mName.value, role: mRole.value, type: mType.value, pass: mPass.value, status: "active" });
   closeMemberModal();
-  toast("تم حفظ العضو الجديد بالسحابة بنجاح!");
+  toast("تم إضافة العضو الجديد بالسحابة بنجاح!");
 };
 
-function toggleBlockMember(key, currentStatus) {
-  const nextStatus = currentStatus === "disabled" ? "active" : "disabled";
-  db.ref('members/' + key).update({ status: nextStatus });
-  toast(nextStatus === "disabled" ? "تم إيقاف حساب العضو" : "تم إعادة تفعيل الحساب");
-}
-
+function toggleBlockMember(key, st) { db.ref('members/' + key).update({ status: st === "disabled" ? "active" : "disabled" }); }
 function resetMemberPass(key) {
-  const newP = prompt("اكتب كلمة المرور الجديدة لهذا العضو:", "123456");
-  if (newP) {
-    db.ref('members/' + key).update({ pass: newP });
-    toast("تم إعادة تعيين كلمة المرور بنجاح!");
-  }
+  const p = prompt("أدخل كلمة المرور الجديدة للعضو:", "123456");
+  if (p) db.ref('members/' + key).update({ pass: p });
 }
-
 function changeMyPassword() {
   const val = document.getElementById("newPassInput").value;
-  if(val) {
-    db.ref('members/' + currentUserId).update({ pass: val });
-    toast("تم تغيير كلمة المرور بنجاح!");
-    document.getElementById("newPassInput").value = "";
-  }
+  if (val) { db.ref('members/' + currentUserId).update({ pass: val }); toast("تم تغيير كلمة المرور!"); }
 }
 
-function switchCurrentUser(key) {
-  currentUserId = key;
-  renderAll();
-  toast("تم التبديل إلى المستخدم المحدد");
+function logout() {
+  currentUserId = null;
+  document.getElementById("appMain").style.display = "none";
+  document.getElementById("loginScreen").style.display = "flex";
 }
 
-function closeModal(){ document.getElementById("modal").classList.remove("show"); }
-function closeMemberModal(){ document.getElementById("memberModal").classList.remove("show"); }
-function toggleMenu(){ document.getElementById("sidebar").classList.toggle("open"); }
-function toast(t){ let x=document.getElementById("toast"); x.textContent=t; x.classList.add("show"); setTimeout(()=>x.classList.remove("show"),2200); }
+function closeModal() { document.getElementById("modal").classList.remove("show"); }
+function closeMemberModal() { document.getElementById("memberModal").classList.remove("show"); }
+function toggleMenu() { document.getElementById("sidebar").classList.toggle("open"); }
+function toggleLang() { document.documentElement.dir = document.documentElement.dir === "rtl" ? "ltr" : "rtl"; }
+function toast(t) { let x = document.getElementById("toast"); x.textContent = t; x.classList.add("show"); setTimeout(() => x.classList.remove("show"), 2200); }
+function exportCSV() {
+  let rows = [["Task", "Priority", "Status", "Progress"], ...tasks.map(x => [x.title, x.priority, x.status, x.progress])];
+  let csv = rows.map(r => r.map(v => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
+  let a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" })); a.download = "tasks.csv"; a.click();
+}
 
 document.querySelectorAll(".nav button[data-page]").forEach(b => {
   b.onclick = () => {
@@ -383,6 +508,7 @@ document.querySelectorAll(".nav button[data-page]").forEach(b => {
     document.getElementById(b.dataset.page).classList.add("active");
     document.querySelectorAll(".nav button").forEach(n => n.classList.remove("active"));
     b.classList.add("active");
+    document.getElementById("sidebar").classList.remove("open");
   }
 });
 </script>
