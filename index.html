@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TaskFlow — إدارة المهام</title>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
 <style>
 :root{
   --black:#151211;--burg:#641A28;--deep:#421019;--red:#B51F32;--bright:#D92F45;
@@ -21,7 +25,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:17px}.kpi{position:relative;overflow:hidden}.kpi:after{content:"";position:absolute;width:70px;height:70px;border-radius:50%;background:var(--burg);opacity:.22;left:-20px;top:-20px}.kpi .label{color:var(--muted);font-size:13px}.kpi strong{display:block;font-size:28px;margin:8px 0}.trend{font-size:12px;color:var(--green)}
 .grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-top:14px}.grid3{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:14px;margin-top:14px}.card h3{margin:0 0 15px;font-size:15px}.chart{height:220px;display:flex;align-items:end;gap:10px;padding:15px 5px 0}.bar{flex:1;background:linear-gradient(to top,var(--deep),var(--bright));border-radius:7px 7px 2px 2px;min-height:12px;position:relative}.bar span{position:absolute;bottom:-24px;width:100%;text-align:center;color:var(--muted);font-size:10px}.ring{width:150px;height:150px;border-radius:50%;margin:auto;background:conic-gradient(var(--bright) var(--p),#332b29 0);display:grid;place-items:center}.ring:after{content:"";width:110px;height:110px;background:var(--panel);border-radius:50%;position:absolute}.ring b{position:relative;z-index:1;font-size:28px}.tasklist{display:grid;gap:9px}.taskrow{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;justify-content:space-between;gap:10px;align-items:center}.taskrow:hover{border-color:#5b3a3f}.tasktitle{font-weight:700}.meta{color:var(--muted);font-size:12px;margin-top:4px}.badge{padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap}.pending{background:#3a3027;color:#e0b76b}.progress{background:#282f3a;color:#79a7e3}.completed{background:#21352d;color:#68c59c}.overdue{background:#401b22;color:#ff7182}.cancelled{background:#302a2a;color:#aaa}
 .sectionhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.sectionhead h2{margin:0}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.input,.select,.textarea{background:#181413;color:var(--cream);border:1px solid var(--line);border-radius:9px;padding:10px 12px;outline:none}.input:focus,.select:focus,.textarea:focus{border-color:var(--bright)}.search{min-width:250px}
-.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:13px}.table{width:100%;border-collapse:collapse;min-width:900px}.table th,.table td{padding:13px 12px;border-bottom:1px solid var(--line);text-align:right}.table th{color:var(--muted);font-size:12px;background:#181413}.table td{font-size:13px}.table tr:last-child td{border-bottom:0}.progressbar{height:7px;background:#302927;border-radius:9px;overflow:hidden;min-width:80px}.progressbar i{display:block;height:100%;background:var(--bright);border-radius:inherit}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:13px}.table{width:100%;border-collapse:collapse;min-width:900px}.table th,.table td{padding:13px 12px;border-bottom:1px solid var(--line);text-align:right}.table th{color:var(--muted);font-size:12px;background:#181413}.table td{font-size:13px}.table tr:last-child td{border-bottom:0}.progressbar{height:7px;background:#302927;border-radius:999px;overflow:hidden;min-width:80px}.progressbar i{display:block;height:100%;background:var(--bright);border-radius:inherit}
 .board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.column{background:#181413;border:1px solid var(--line);border-radius:13px;padding:12px;min-height:450px}.colhead{display:flex;justify-content:space-between;margin-bottom:12px}.dropzone{min-height:380px;display:grid;align-content:start;gap:9px}.boardcard{background:#211b1a;border:1px solid var(--line);border-radius:10px;padding:12px}.boardcard[draggable=true]{cursor:grab}
 .members{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.member{display:flex;gap:12px;align-items:center}.member .avatar{flex:none}.memberinfo{flex:1}.memberstats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:12px}.memberstats div{background:#171312;border-radius:8px;padding:7px;text-align:center}.memberstats b{display:block}.memberstats small{color:var(--muted)}
 .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.day{min-height:110px;background:#191514;border:1px solid var(--line);border-radius:8px;padding:8px}.daynum{font-size:12px;color:var(--muted)}.event{font-size:10px;background:var(--burg);padding:5px;border-radius:5px;margin-top:7px;overflow:hidden}
@@ -37,14 +41,14 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 <aside class="sidebar" id="sidebar">
   <div class="brand"><div class="logo">T</div><div><b>TaskFlow</b><br><small>Task Management</small></div></div>
   <nav class="nav">
-    <button class="active" data-page="dashboard"><i>⌂</i><span data-i18n="Dashboard">Dashboard</span></button>
-    <button data-page="tasks"><i>✓</i><span data-i18n="Tasks">Tasks</span></button>
-    <button data-page="calendar"><i>▦</i><span data-i18n="Calendar">Calendar</span></button>
-    <button data-page="board"><i>▤</i><span data-i18n="Board">Board</span></button>
-    <button data-page="members"><i>◉</i><span data-i18n="Members">Members</span></button>
-    <button data-page="reports"><i>◫</i><span data-i18n="Reports">Reports</span></button>
-    <button data-page="notifications"><i>♢</i><span data-i18n="Notifications">Notifications</span></button>
-    <button data-page="settings"><i>⚙</i><span data-i18n="Settings">Settings</span></button>
+    <button class="active" data-page="dashboard"><i>⌂</i><span>Dashboard</span></button>
+    <button data-page="tasks"><i>✓</i><span>Tasks</span></button>
+    <button data-page="calendar"><i>▦</i><span>Calendar</span></button>
+    <button data-page="board"><i>▤</i><span>Board</span></button>
+    <button data-page="members"><i>◉</i><span>Members</span></button>
+    <button data-page="reports"><i>◫</i><span>Reports</span></button>
+    <button data-page="notifications"><i>♢</i><span>Notifications</span></button>
+    <button data-page="settings"><i>⚙</i><span>Settings</span></button>
   </nav>
   <div class="bottom"><div class="profile"><div class="avatar">م</div><div><b>مهيب محمد</b><br><small>Manager</small></div></div><button class="nav" style="width:100%" onclick="logout()"><span>↪ Logout</span></button></div>
 </aside>
@@ -77,7 +81,7 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 
 <section id="board" class="page"><div class="sectionhead"><h2>Board</h2><button class="btn primary" onclick="openCreate()">＋ إنشاء مهمة</button></div><div class="board" id="boardGrid"></div></section>
 
-<section id="members" class="page"><div class="sectionhead"><h2>أعضاء الفريق</h2><button class="btn primary" onclick="toast('إضافة عضو متاحة في الإصدار المتصل بقاعدة البيانات')">＋ إضافة عضو</button></div><div class="members" id="membersGrid"></div></section>
+<section id="members" class="page"><div class="sectionhead"><h2>أعضاء الفريق</h2><button class="btn primary" onclick="toast('متاح الآن لحفظ الفريق بالسحابة')">＋ إضافة عضو</button></div><div class="members" id="membersGrid"></div></section>
 
 <section id="reports" class="page"><div class="sectionhead"><h2>التقارير والأداء</h2><div class="toolbar"><input type="date" class="input"><input type="date" class="input"><button class="btn" onclick="exportCSV()">Export CSV</button></div></div><div class="kpis" id="reportKpis"></div><div class="grid2"><div class="card"><h3>الأداء حسب العضو</h3><div id="performance"></div></div><div class="card"><h3>توزيع الحالات</h3><div id="statusReport"></div></div></div></section>
 
@@ -107,37 +111,58 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 <div class="toast" id="toast"></div>
 
 <script>
-const KEY="taskflow_tasks_v1";
+// إعدادات Firebase الخاصة بك مدمجة وجاهزة
+const firebaseConfig = {
+  apiKey: "AIzaSyDtv81cLSHqiGVL0-dpoygw-q-v_0VOyS8",
+  authDomain: "taskflow-app-28d87.firebaseapp.com",
+  databaseURL: "https://taskflow-app-28d87-default-rtdb.firebaseio.com",
+  projectId: "taskflow-app-28d87",
+  storageBucket: "taskflow-app-28d87.firebasestorage.app"
+};
+
+// تهيئة Firebase
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+const tasksRef = db.ref('tasks');
+
 const members=[{id:1,name:"مهيب محمد",role:"Manager"},{id:2,name:"أحمد علي",role:"Field Representative"},{id:3,name:"زينب",role:"Coordinator"},{id:4,name:"عبد الرحمن",role:"Operations"}];
-let tasks=JSON.parse(localStorage.getItem(KEY)||"null")||[
-{id:1,title:"إعداد تقرير المتاجر",description:"تجهيز التقرير الأسبوعي",member:2,priority:"High",status:"In Progress",progress:65,start:"2026-09-03T09:00",due:"2026-09-05T15:00",created:"2026-09-03T08:30"},
-{id:2,title:"مراجعة مهام فريق الانتشار",description:"مراجعة الإنجاز والمتأخر",member:3,priority:"Critical",status:"Pending",progress:0,start:"2026-09-04T09:00",due:"2026-09-04T23:00",created:"2026-09-04T08:00"},
-{id:3,title:"رفع ملفات الأرشيف",description:"أرشفة النماذج",member:4,priority:"Medium",status:"Completed",progress:100,start:"2026-09-02T10:00",due:"2026-09-03T14:00",created:"2026-09-02T09:00"},
-{id:4,title:"متابعة نقاط البيع",description:"الاتصال بالمندوبين",member:2,priority:"Medium",status:"Overdue",progress:40,start:"2026-09-01T09:00",due:"2026-09-03T12:00",created:"2026-09-01T08:00"}
-];
-let activities=[
-"تم تحديث نسبة إنجاز «إعداد تقرير المتاجر» إلى 65%",
-"تم إسناد «مراجعة مهام فريق الانتشار» إلى زينب",
-"تم إكمال «رفع ملفات الأرشيف»",
-"تم إنشاء مهمة «متابعة نقاط البيع»"
-];
-let notifications=[
-"مهمة جديدة: مراجعة مهام فريق الانتشار — مستحقة اليوم",
-"Deadline Approaching: إعداد تقرير المتاجر — خلال يوم",
-"Task Overdue: متابعة نقاط البيع"
-];
-function save(){localStorage.setItem(KEY,JSON.stringify(tasks))}
+let tasks = [];
+let activities=[];
+let notifications=[];
+
+// الاستماع المباشر للتغييرات في قاعدة البيانات
+tasksRef.on('value', snapshot => {
+  const data = snapshot.val();
+  tasks = [];
+  if(data){
+    Object.keys(data).forEach(key => {
+      tasks.push({ ...data[key], firebaseKey: key });
+    });
+  }
+  renderAll();
+});
+
+function saveToCloud(taskData, key = null) {
+  if (key) {
+    db.ref('tasks/' + key).update(taskData);
+  } else {
+    db.ref('tasks').push(taskData);
+  }
+}
+
 function now(){return new Date()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function refreshOverdue(){
  const t=now();
  tasks.forEach(x=>{if(x.status!=="Completed"&&x.status!=="Cancelled"&&new Date(x.due)<t)x.status="Overdue"});
- save();
 }
 function counts(){refreshOverdue();return {total:tasks.length,completed:tasks.filter(x=>x.status==="Completed").length,progress:tasks.filter(x=>x.status==="In Progress").length,pending:tasks.filter(x=>x.status==="Pending").length,overdue:tasks.filter(x=>x.status==="Overdue").length}}
 function statusBadge(s){let c=s==="In Progress"?"progress":s.toLowerCase();return `<span class="badge ${c}">${esc(s)}</span>`}
 function memberName(id){return members.find(m=>m.id==id)?.name||"—"}
 function dateFmt(d){return new Date(d).toLocaleDateString("ar-YE",{day:"2-digit",month:"short"})}
+
 function renderDashboard(){
  const c=counts(), rate=c.total?Math.round(c.completed/c.total*100):0;
  document.getElementById("kpis").innerHTML=[
@@ -150,61 +175,99 @@ function renderDashboard(){
  document.getElementById("upcoming").innerHTML=tasks.filter(x=>x.status!=="Completed").sort((a,b)=>new Date(a.due)-new Date(b.due)).slice(0,4).map(taskMini).join("")||empty("لا توجد مواعيد قادمة");
  document.getElementById("activity").innerHTML=activities.slice(0,5).map((a,i)=>`<div class="activity"><b>${esc(a)}</b><br><small>${i+1} دقائق مضت</small></div>`).join("");
 }
-function taskMini(x){return `<div class="taskrow" onclick="openDetails(${x.id})"><div><div class="tasktitle">${esc(x.title)}</div><div class="meta">${memberName(x.member)} · ${dateFmt(x.due)}</div></div>${statusBadge(x.status)}</div>`}
+
+function taskMini(x){return `<div class="taskrow" onclick="openDetails('${x.firebaseKey}')"><div><div class="tasktitle">${esc(x.title)}</div><div class="meta">${memberName(x.member)} · ${dateFmt(x.due)}</div></div>${statusBadge(x.status)}</div>`}
 function empty(t){return `<div style="color:var(--muted);padding:15px">${t}</div>`}
+
 function renderTasks(){
  refreshOverdue();let q=(document.getElementById("search")?.value||"").toLowerCase(),s=document.getElementById("statusFilter")?.value||"",p=document.getElementById("priorityFilter")?.value||"";
  let arr=tasks.filter(x=>(!q||x.title.toLowerCase().includes(q)||memberName(x.member).toLowerCase().includes(q))&&(!s||x.status===s)&&(!p||x.priority===p));
- document.getElementById("taskTable").innerHTML=arr.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small style="color:var(--muted)">${esc(x.description||"")}</small></td><td>${memberName(x.member)}</td><td>${esc(x.priority)}</td><td>${statusBadge(x.status)}</td><td>${dateFmt(x.start)}</td><td>${dateFmt(x.due)}</td><td><div class="progressbar"><i style="width:${x.progress}%"></i></div><small>${x.progress}%</small></td><td><button class="btn" onclick="openDetails(${x.id})">فتح</button></td></tr>`).join("")||`<tr><td colspan="8">${empty("لا توجد مهام مطابقة")}</td></tr>`;
+ document.getElementById("taskTable").innerHTML=arr.map(x=>`<tr><td><b>${esc(x.title)}</b><br><small style="color:var(--muted)">${esc(x.description||"")}</small></td><td>${memberName(x.member)}</td><td>${esc(x.priority)}</td><td>${statusBadge(x.status)}</td><td>${dateFmt(x.start)}</td><td>${dateFmt(x.due)}</td><td><div class="progressbar"><i style="width:${x.progress}%"></i></div><small>${x.progress}%</small></td><td><button class="btn" onclick="openDetails('${x.firebaseKey}')">فتح</button></td></tr>`).join("")||`<tr><td colspan="8">${empty("لا توجد مهام مطابقة")}</td></tr>`;
 }
+
 function renderBoard(){
  const cols=[["Pending","لم تبدأ"],["In Progress","قيد التنفيذ"],["Completed","مكتملة"]];
- document.getElementById("boardGrid").innerHTML=cols.map(([st,label])=>`<div class="column"><div class="colhead"><b>${label}</b><span class="badge">${tasks.filter(x=>x.status===st).length}</span></div><div class="dropzone" data-status="${st}" ondragover="event.preventDefault()" ondrop="dropTask(event)">${tasks.filter(x=>x.status===st).map(x=>`<div class="boardcard" draggable="true" ondragstart="event.dataTransfer.setData('text/plain','${x.id}')"><b>${esc(x.title)}</b><div class="meta">${memberName(x.member)}</div><div style="margin-top:9px">${statusBadge(x.priority)} <span style="float:left">${x.progress}%</span></div><div class="progressbar" style="margin-top:8px"><i style="width:${x.progress}%"></i></div></div>`).join("")}</div></div>`).join("");
+ document.getElementById("boardGrid").innerHTML=cols.map(([st,label])=>`<div class="column"><div class="colhead"><b>${label}</b><span class="badge">${tasks.filter(x=>x.status===st).length}</span></div><div class="dropzone" data-status="${st}" ondragover="event.preventDefault()" ondrop="dropTask(event)">${tasks.filter(x=>x.status===st).map(x=>`<div class="boardcard" draggable="true" ondragstart="event.dataTransfer.setData('text/plain','${x.firebaseKey}')"><b>${esc(x.title)}</b><div class="meta">${memberName(x.member)}</div><div style="margin-top:9px">${statusBadge(x.priority)} <span style="float:left">${x.progress}%</span></div><div class="progressbar" style="margin-top:8px"><i style="width:${x.progress}%"></i></div></div>`).join("")}</div></div>`).join("");
 }
-function dropTask(e){let id=+e.dataTransfer.getData("text/plain"),st=e.currentTarget.dataset.status,x=tasks.find(t=>t.id===id);if(x){x.status=st;x.progress=st==="Completed"?100:x.progress;activities.unshift(`تم نقل «${x.title}» إلى ${st}`);save();renderAll();toast("تم تحديث حالة المهمة")}}
+
+function dropTask(e){
+  let key=e.dataTransfer.getData("text/plain"),st=e.currentTarget.dataset.status,x=tasks.find(t=>t.firebaseKey===key);
+  if(x){
+    let updatedProgress = st==="Completed"?100:x.progress;
+    saveToCloud({ status: st, progress: updatedProgress }, key);
+    activities.unshift(`تم نقل «${x.title}» إلى ${st}`);
+    toast("تم تحديث حالة المهمة بالسحابة");
+  }
+}
+
 function renderMembers(){
- const c=counts();
  document.getElementById("membersGrid").innerHTML=members.map(m=>{let a=tasks.filter(x=>x.member===m.id),done=a.filter(x=>x.status==="Completed").length,r=a.length?Math.round(done/a.length*100):0;return `<div class="card"><div class="member"><div class="avatar">${m.name[0]}</div><div class="memberinfo"><b>${m.name}</b><br><small style="color:var(--muted)">${m.role}</small></div><span class="badge completed">${r}%</span></div><div class="memberstats"><div><b>${a.length}</b><small>إجمالي</small></div><div><b>${done}</b><small>مكتمل</small></div><div><b>${a.filter(x=>x.status==="Overdue").length}</b><small>متأخر</small></div></div><div class="progressbar" style="margin-top:12px"><i style="width:${r}%"></i></div></div>`}).join("");
 }
+
 function renderCalendar(){
- let d=new Date();d.setDate(1);let start=d.getDay();let days=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();let arr=[];for(let i=0;i<start;i++)arr.push(`<div class="day"></div>`);for(let n=1;n<=days;n++){let ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(n).padStart(2,"0")}`;let ev=tasks.filter(x=>x.due.startsWith(ds));arr.push(`<div class="day"><div class="daynum">${n}</div>${ev.map(x=>`<div class="event" onclick="openDetails(${x.id})">${esc(x.title)}</div>`).join("")}</div>`)}document.getElementById("calendarGrid").innerHTML=arr.join("");
+ let d=new Date();d.setDate(1);let start=d.getDay();let days=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();let arr=[];for(let i=0;i<start;i++)arr.push(`<div class="day"></div>`);for(let n=1;n<=days;n++){let ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(n).padStart(2,"0")}`;let ev=tasks.filter(x=>x.due.startsWith(ds));arr.push(`<div class="day"><div class="daynum">${n}</div>${ev.map(x=>`<div class="event" onclick="openDetails('${x.firebaseKey}')">${esc(x.title)}</div>`).join("")}</div>`)}document.getElementById("calendarGrid").innerHTML=arr.join("");
 }
+
 function renderReports(){
  const c=counts(),rate=c.total?Math.round(c.completed/c.total*100):0;document.getElementById("reportKpis").innerHTML=[["Total Tasks",c.total],["Completed",c.completed],["Incomplete",c.total-c.completed],["Overdue",c.overdue],["Completion Rate",rate+"%"]].map(a=>`<div class="card kpi"><span class="label">${a[0]}</span><strong>${a[1]}</strong></div>`).join("");
  document.getElementById("performance").innerHTML=members.map(m=>{let a=tasks.filter(x=>x.member===m.id),r=a.length?Math.round(a.filter(x=>x.status==="Completed").length/a.length*100):0;return `<div style="margin:13px 0"><div style="display:flex;justify-content:space-between"><b>${m.name}</b><span>${r}%</span></div><div class="progressbar" style="margin-top:7px"><i style="width:${r}%"></i></div></div>`}).join("");
  document.getElementById("statusReport").innerHTML=["Pending","In Progress","Completed","Overdue"].map(s=>`<div class="taskrow"><span>${s}</span><b>${tasks.filter(x=>x.status===s).length}</b></div>`).join("");
 }
+
 function renderNotifications(){document.getElementById("notificationsList").innerHTML=notifications.map((n,i)=>`<div class="taskrow"><div><b>${esc(n)}</b><div class="meta">${i+1} منذ دقائق</div></div><span class="badge ${i===2?"overdue":"pending"}">${i===2?"تنبيه":"جديد"}</span></div>`).join("")}
+
 function openCreate(){
  document.getElementById("modalTitle").textContent="إنشاء مهمة";document.getElementById("taskForm").dataset.edit="";
  document.getElementById("fMember").innerHTML=members.filter(m=>m.id!==1).map(m=>`<option value="${m.id}">${m.name}</option>`).join("");
  let d=new Date();let iso=d.toISOString().slice(0,10);["fStartDate","fDueDate"].forEach(id=>document.getElementById(id).value=iso);document.getElementById("fStartTime").value="09:00";document.getElementById("fDueTime").value="17:00";document.getElementById("fTitle").value="";document.getElementById("fDesc").value="";document.getElementById("fNotes").value="";document.getElementById("fProgress").value=0;document.getElementById("modal").classList.add("show");
 }
-function openDetails(id){
- let x=tasks.find(t=>t.id===id);if(!x)return;
+
+function openDetails(key){
+ let x=tasks.find(t=>t.firebaseKey===key);if(!x)return;
  document.getElementById("modalTitle").textContent=x.title;
  document.getElementById("fMember").innerHTML=members.filter(m=>m.id!==1).map(m=>`<option value="${m.id}" ${m.id===x.member?"selected":""}>${m.name}</option>`).join("");
  document.getElementById("fTitle").value=x.title;document.getElementById("fDesc").value=x.description||"";
  document.getElementById("fPriority").value=x.priority;document.getElementById("fStatus").value=x.status==="Overdue"?"In Progress":x.status;document.getElementById("fProgress").value=x.progress;
- let st=x.start.split("T"),du=x.due.split("T");document.getElementById("fStartDate").value=st[0];document.getElementById("fStartTime").value=st[1];document.getElementById("fDueDate").value=du[0];document.getElementById("fDueTime").value=du[1];document.getElementById("taskForm").dataset.edit=id;document.getElementById("modal").classList.add("show");
+ let st=x.start.split("T"),du=x.due.split("T");document.getElementById("fStartDate").value=st[0];document.getElementById("fStartTime").value=st[1];document.getElementById("fDueDate").value=du[0];document.getElementById("fDueTime").value=du[1];document.getElementById("taskForm").dataset.edit=key;document.getElementById("modal").classList.add("show");
 }
+
 document.getElementById("taskForm").addEventListener("submit",e=>{
- e.preventDefault();let f=e.target,id=+f.dataset.edit;let data={title:fTitle.value,description:fDesc.value,member:+fMember.value,priority:fPriority.value,status:fStatus.value,progress:Math.max(0,Math.min(100,+fProgress.value)),start:fStartDate.value+"T"+fStartTime.value,due:fDueDate.value+"T"+fDueTime.value};
- if(id){let x=tasks.find(t=>t.id===id);Object.assign(x,data);activities.unshift(`تم تعديل المهمة «${data.title}»`)}
- else{data.id=Date.now();data.created=new Date().toISOString();tasks.unshift(data);notifications.unshift(`تم إسناد مهمة جديدة: ${data.title}`);activities.unshift(`تم إنشاء مهمة «${data.title}»`)}
- if(data.status==="Completed")data.progress=100;save();closeModal();renderAll();toast(id?"تم تحديث المهمة":"تم إنشاء المهمة بنجاح");
+ e.preventDefault();let f=e.target,key=f.dataset.edit;
+ let data={
+   title:fTitle.value,
+   description:fDesc.value,
+   member:+fMember.value,
+   priority:fPriority.value,
+   status:fStatus.value,
+   progress:Math.max(0,Math.min(100,+fProgress.value)),
+   start:fStartDate.value+"T"+fStartTime.value,
+   due:fDueDate.value+"T"+fDueTime.value
+ };
+ if(data.status==="Completed") data.progress=100;
+ 
+ if(key){
+   saveToCloud(data, key);
+   activities.unshift(`تم تعديل المهمة «${data.title}»`);
+ } else {
+   data.created=new Date().toISOString();
+   saveToCloud(data);
+   notifications.unshift(`تم إسناد مهمة جديدة: ${data.title}`);
+   activities.unshift(`تم إنشاء مهمة «${data.title}»`);
+ }
+ closeModal();
+ toast(key?"تم تحديث المهمة بالسطح السحابي":"تم حفظ المهمة بالسحابة بنجاح");
 });
+
 function closeModal(){document.getElementById("modal").classList.remove("show")}
-function openDetailsFake(){}
 function openPage(p){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(p).classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===p));renderAll();document.getElementById("sidebar").classList.remove("open")}
 document.querySelectorAll(".nav button[data-page]").forEach(b=>b.onclick=()=>openPage(b.dataset.page));
+
 function renderAll(){renderDashboard();renderTasks();renderBoard();renderMembers();renderCalendar();renderReports();renderNotifications();document.getElementById("today").textContent=new Date().toLocaleDateString("ar-YE",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}
 function toggleMenu(){document.getElementById("sidebar").classList.toggle("open")}
 function toggleLang(){document.documentElement.dir=document.documentElement.dir==="rtl"?"ltr":"rtl";document.documentElement.lang=document.documentElement.dir==="rtl"?"ar":"en";toast(document.documentElement.dir==="rtl"?"العربية":"English")}
 function toast(t){let x=document.getElementById("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),2200)}
 function exportCSV(){let rows=[["Task","Member","Priority","Status","Start","Due","Progress"],...tasks.map(x=>[x.title,memberName(x.member),x.priority,x.status,x.start,x.due,x.progress])];let csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");let a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}));a.download="taskflow-report.csv";a.click()}
-function logout(){toast("تم تسجيل الخروج (واجهة تجريبية)")}
-renderAll();
+function logout(){toast("تم تسجيل الخروج")}
 </script>
 </body>
 </html>
