@@ -32,9 +32,11 @@ export default async function handler(req, res) {
     if (!question) return res.status(400).json({ error: 'question is required' });
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+    // Use the current model explicitly. Do not read GEMINI_MODEL so an old
+    // Vercel environment variable cannot force the retired gemini-2.5-flash.
     const model = genAI.getGenerativeModel({
-      // Stable, cost-effective model suitable for TaskFlow's operational AI.
-      model: process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite'
+      model: 'gemini-3.6-flash'
     });
 
     const prompt = `أنت مساعد إدارة عمليات اسمه TaskFlow AI.
@@ -54,6 +56,11 @@ ${excelSummary}
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
+
+    if (!text?.trim()) {
+      return res.status(502).json({ error: 'AI returned an empty response' });
+    }
+
     return res.status(200).json({ ok: true, answer: text });
   } catch (error) {
     console.error('TaskFlow AI error:', error);
@@ -61,6 +68,7 @@ ${excelSummary}
     const message = String(error?.message || 'AI request failed')
       .replace(/AIza[0-9A-Za-z_-]+/g, '[REDACTED]')
       .slice(0, 1000);
+
     return res.status(status >= 400 && status < 600 ? status : 500).json({
       error: 'AI request failed',
       details: message
