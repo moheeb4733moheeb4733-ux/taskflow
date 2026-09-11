@@ -35,8 +35,6 @@
     t.classList.add('show'); clearTimeout(t._timer); t._timer=setTimeout(()=>t.classList.remove('show'),3000);
   }
   window.taskflowSuccess=success;
-
-  // منع رسائل Chrome/المتصفح القديمة واستبدال alert بإشعار داخل TaskFlow.
   window.alert=function(message){success(String(message||'تم تنفيذ العملية.'));};
 
   function dashboardConfirm(message,onYes){
@@ -59,6 +57,53 @@
       db.ref('members/'+key).remove().then(()=>success('تم حذف العضو بنجاح.')).catch(err=>success('تعذر حذف العضو: '+(err?.message||'خطأ غير معروف')));
     });
   };
+
+  function installRememberMe(){
+    const form=document.getElementById('loginForm');
+    if(!form)return;
+    ensureStyle();
+    let row=document.getElementById('tf-remember-row');
+    if(!row){
+      row=document.createElement('label');
+      row.id='tf-remember-row';
+      row.innerHTML='<input type="checkbox" id="tfRememberMe"><span>تذكرني على هذا الجهاز</span>';
+      const pass=document.getElementById('loginPassInput');
+      pass?.closest('.field')?.insertAdjacentElement('afterend',row);
+    }
+    const checkbox=document.getElementById('tfRememberMe');
+    if(checkbox&&!checkbox.dataset.initialized){
+      checkbox.checked=localStorage.getItem('taskflow_remember_me')==='1';
+      checkbox.dataset.initialized='1';
+    }
+    if(form.dataset.tfRememberWrapped)return;
+    form.addEventListener('submit',function(e){
+      // هذا المعالج هو المسؤول الوحيد عن تسجيل الدخول؛ امنع onsubmit القديم من العمل معه.
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const inputName=document.getElementById('loginNameInput').value.trim().toLowerCase();
+      const inputPass=document.getElementById('loginPassInput').value.trim();
+      const user=window.members.find(m=>m.name.toLowerCase().includes(inputName)||inputName.includes(m.name.toLowerCase()));
+      if(!user){success('اسم الموظف غير مسجل بالنظام!');return;}
+      if(user.status==='disabled'){success('هذا الحساب معطل حالياً من قبل مدير النظام!');return;}
+      if(user.pass!==inputPass){success('كلمة المرور غير صحيحة!');return;}
+
+      currentUserId=user.firebaseKey;
+      const remember=!!document.getElementById('tfRememberMe')?.checked;
+      if(remember){
+        localStorage.setItem('taskflow_user_id',user.firebaseKey);
+        localStorage.setItem('taskflow_remember_me','1');
+      }else{
+        localStorage.removeItem('taskflow_user_id');
+        localStorage.removeItem('taskflow_remember_me');
+      }
+      document.getElementById('loginScreen').style.display='none';
+      document.getElementById('appMain').style.display='flex';
+      window.applyUserPermissions?.(user);
+      window.toast?.(`أهلاً بك 👋 ${user.name}`);
+      window.renderAll?.();
+    },true);
+    form.dataset.tfRememberWrapped='1';
+  }
 
   function install(){
     ensureStyle();
@@ -125,72 +170,9 @@
     return true;
   }
 
-  function installRememberMe(){
-    const form=document.getElementById('loginForm');
-    if(!form)return;
-    ensureStyle();
-    let row=document.getElementById('tf-remember-row');
-    if(!row){
-      row=document.createElement('label');
-      row.id='tf-remember-row';
-      row.innerHTML='<input type="checkbox" id="tfRememberMe"><span>تذكرني على هذا الجهاز</span>';
-      const pass=document.getElementById('loginPassInput');
-      pass?.closest('.field')?.insertAdjacentElement('afterend',row);
-    }
-    const checkbox=document.getElementById('tfRememberMe');
-    if(checkbox&&!checkbox.dataset.initialized){
-      checkbox.checked=localStorage.getItem('taskflow_remember_me')==='1';
-      checkbox.dataset.initialized='1';
-    }
-    if(form.dataset.tfRememberWrapped)return;
-    form.addEventListener('submit',function(e){
-      e.preventDefault();
-      const inputName=document.getElementById('loginNameInput').value.trim().toLowerCase();
-      const inputPass=document.getElementById('loginPassInput').value.trim();
-      const user=(window.members||[]).find(m=>m.name.toLowerCase().includes(inputName)||inputName.includes(m.name.toLowerCase()));
-      if(!user){success('اسم الموظف غير مسجل بالنظام!');return;}
-      if(user.status==='disabled'){success('هذا الحساب معطل حالياً من قبل مدير النظام!');return;}
-      if(user.pass!==inputPass){success('كلمة المرور غير صحيحة!');return;}
-
-      // مزامنة مع المتغير العالمي الموجود في index.html.
-      try{currentUserId=user.firebaseKey;}catch(_){window.currentUserId=user.firebaseKey;}
-      const remember=!!document.getElementById('tfRememberMe')?.checked;
-      if(remember){
-        localStorage.setItem('taskflow_user_id',user.firebaseKey);
-        localStorage.setItem('taskflow_remember_me','1');
-        sessionStorage.removeItem('taskflow_user_id');
-      }else{
-        localStorage.removeItem('taskflow_user_id');
-        localStorage.removeItem('taskflow_remember_me');
-        sessionStorage.setItem('taskflow_user_id',user.firebaseKey);
-      }
-      document.getElementById('loginScreen').style.display='none';
-      document.getElementById('appMain').style.display='flex';
-      window.applyUserPermissions?.(user);
-      window.toast?.(`أهلاً بك 👋 ${user.name}`);
-      window.renderAll?.();
-    },true);
-    form.dataset.tfRememberWrapped='1';
-  }
-
-  function restoreRememberedSession(){
-    const saved=localStorage.getItem('taskflow_user_id');
-    const session=sessionStorage.getItem('taskflow_user_id');
-    try{currentUserId=saved||session||null;}catch(_){window.currentUserId=saved||session||null;}
-    if(saved||session){
-      const user=(window.members||[]).find(m=>m.firebaseKey===(saved||session));
-      if(user&&user.status!=='disabled'){
-        document.getElementById('loginScreen').style.display='none';
-        document.getElementById('appMain').style.display='flex';
-        window.applyUserPermissions?.(user);
-      }
-    }
-  }
-
   function boot(){
     ensureStyle();
     installRememberMe();
-    restoreRememberedSession();
     if(install())return;
     setTimeout(install,300);setTimeout(install,1000);setTimeout(install,2000);
   }
