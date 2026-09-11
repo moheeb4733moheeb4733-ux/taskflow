@@ -1,4 +1,4 @@
-name: Integrate TaskFlow AI
+name: Integrate TaskFlow AI and UI
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - 'index.html'
       - 'taskflow-ai-widget.js'
       - 'ai-data-layer.js'
-      - 'taskflow-theme.js'
+      - 'taskflow-ui-enhancements.js'
       - '.github/workflows/integrate-taskflow-ai.yml'
 
 permissions:
@@ -23,7 +23,7 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Integrate TaskFlow AI and theme
+      - name: Integrate TaskFlow AI and UI enhancements
         shell: bash
         run: |
           set -e
@@ -37,7 +37,7 @@ jobs:
           tags = [
               '<script src="/ai-data-layer.js" defer></script>',
               '<script src="/taskflow-ai-widget.js" defer></script>',
-              '<script src="/taskflow-theme.js" defer></script>'
+              '<script src="/taskflow-ui-enhancements.js" defer></script>'
           ]
           changed = False
           for tag in tags:
@@ -46,8 +46,6 @@ jobs:
                   changed = True
           if changed:
               p.write_text(s, encoding='utf-8')
-          else:
-              print('TaskFlow AI/theme integration is already complete.')
           PY
           if git diff --quiet -- index.html; then
             echo 'No dashboard integration changes needed.'
@@ -56,5 +54,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'feat: integrate TaskFlow day night theme'
+          git commit -m 'feat: integrate TaskFlow AI and dashboard UI enhancements'
           git push origin main
