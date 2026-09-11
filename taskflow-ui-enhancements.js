@@ -11,11 +11,6 @@
   .tf-theme-btn{width:40px;height:40px;border:1px solid var(--line);background:var(--panel);color:var(--cream);border-radius:10px;display:grid;place-items:center;font-size:20px;cursor:pointer}
   .sidebar{overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}.sidebar::-webkit-scrollbar{display:none}
   .sidebar .tree-3d-box{flex:0 0 auto;min-height:160px}
-  .tf-side-tools{display:grid;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);flex:0 0 auto}
-  .tf-side-tool{border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--cream);border-radius:10px;padding:10px 11px;display:flex;align-items:center;gap:9px;font-weight:700;text-align:right;width:100%}
-  .tf-side-tool:hover{background:rgba(99,91,255,.14);border-color:#635bff}.tf-side-tool .ico{width:25px;text-align:center;font-size:17px}
-  .tf-excel-status{padding:8px 12px;font-size:11px;color:#10b981;display:none}
-  html.tf-day .tf-side-tool{background:#f8fafc;color:#18202b}
   #tfai-page{right:260px!important;left:0!important;top:0!important;bottom:0!important;inset:auto!important;padding:24px!important;z-index:9996!important}
   #tfai-page.show{display:block!important}
   @media(max-width:700px){#tfai-page{right:0!important;padding:10px!important}}
@@ -25,7 +20,7 @@
   const saved=localStorage.getItem('taskflow_theme')||'night';setTheme(saved);
   function cleanBrand(){const brand=document.querySelector('.sidebar .brand');if(!brand)return;const main=brand.querySelector('b');if(main)main.textContent='قسم المتاجر';const small=brand.querySelector('small');if(small)small.remove();document.title='قسم المتاجر — نظام إدارة المهام والمراقبة اليومية'}
   function addThemeButton(){if(document.getElementById('tf-theme-toggle'))return;const b=document.createElement('button');b.id='tf-theme-toggle';b.className='tf-theme-btn';b.onclick=()=>setTheme(root.classList.contains('tf-day')?'night':'day');b.setAttribute('aria-label','تبديل الوضع الليلي والنهاري');const actions=document.querySelector('.actions');if(actions)actions.prepend(b)}
-  function loadAI(){return new Promise((resolve,reject)=>{if(window.TaskFlowAI)return resolve(window.TaskFlowAI);if(document.querySelector('script[data-taskflow-ai]')){let n=0;const t=setInterval(()=>{if(window.TaskFlowAI){clearInterval(t);resolve(window.TaskFlowAI)}else if(++n>40){clearInterval(t);reject(new Error('AI load timeout'))}},100);return}const s=document.createElement('script');s.src='/taskflow-ai-widget.js?fix=2';s.defer=true;s.dataset.taskflowAi='1';s.onload=()=>{let n=0;const t=setInterval(()=>{if(window.TaskFlowAI){clearInterval(t);resolve(window.TaskFlowAI)}else if(++n>40){clearInterval(t);reject(new Error('AI init timeout'))}},100)};s.onerror=reject;document.head.appendChild(s)})}
-  function addTools(){if(document.getElementById('tf-side-tools'))return;const sidebar=document.querySelector('.sidebar');if(!sidebar)return;const box=document.createElement('div');box.id='tf-side-tools';box.className='tf-side-tools';box.innerHTML=`<button class="tf-side-tool" id="tf-side-ai"><span class="ico">✦</span><span>TaskFlow AI</span></button><button class="tf-side-tool" id="tf-side-excel"><span class="ico">📊</span><span>إضافة ملف Excel</span></button><div id="tf-excel-status" class="tf-excel-status"></div><input id="tf-excel-input" type="file" accept=".xlsx,.xls,.csv" hidden>`;const nav=sidebar.querySelector('.nav');if(nav)nav.insertAdjacentElement('afterend',box);else sidebar.appendChild(box);const ai=document.getElementById('tf-side-ai');if(ai)ai.onclick=async()=>{try{const api=await loadAI();api?.openPage?.()}catch(e){const b=document.getElementById('tfai-btn');if(b)b.click();else alert('تعذر تحميل TaskFlow AI، أعد تحديث الصفحة مرة واحدة.')}};document.getElementById('tf-side-excel').onclick=()=>document.getElementById('tf-excel-input').click();document.getElementById('tf-excel-input').onchange=e=>{const f=e.target.files?.[0];if(!f)return;const s=document.getElementById('tf-excel-status');s.style.display='block';s.textContent='✓ '+f.name;window.taskflowExcelFile=f;window.dispatchEvent(new CustomEvent('taskflow-excel-selected',{detail:{file:f}}));}};
-  function init(){cleanBrand();addThemeButton();addTools()}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();setTimeout(init,1000);setTimeout(init,2500);
+  function init(){cleanBrand();addThemeButton()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+  setTimeout(init,1000);setTimeout(init,2500);
 })();
