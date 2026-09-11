@@ -1,0 +1,33 @@
+name: Fix AI Quick Commands Layout
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-ai-quick-layout.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch widget styles
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('taskflow-ai-widget.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('.tfai-quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}', '.tfai-quick{display:flex;flex-wrap:wrap;align-items:center;gap:7px}')
+          s=s.replace('.tfai-command{display:flex;align-items:center;gap:4px;min-width:0}', '.tfai-command{display:inline-flex;align-items:center;gap:2px;flex:0 0 auto;min-width:0;max-width:100%}')
+          s=s.replace('.tfai-chip{flex:1;min-width:0;', '.tfai-chip{flex:0 0 auto;min-width:0;')
+          s=s.replace('white-space:nowrap;overflow:hidden;text-overflow:ellipsis}', 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:min(260px,42vw)}', 1)
+          s=s.replace('@media(max-width:600px){.tfai-quick{grid-template-columns:1fr}', '@media(max-width:600px){.tfai-quick{display:flex;flex-direction:column;align-items:stretch}.tfai-command{width:100%}.tfai-chip{max-width:none;flex:1}')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit and remove temporary workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add taskflow-ai-widget.js
+          git rm .github/workflows/fix-ai-quick-layout.yml
+          git commit -m 'fix: compact inline AI quick commands'
+          git push
