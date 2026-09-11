@@ -13,16 +13,14 @@
   .sidebar .tree-3d-box{flex:0 0 auto;min-height:160px}
   #tfai-page{right:260px!important;left:0!important;top:0!important;bottom:0!important;inset:auto!important;padding:24px!important;z-index:9996!important}
   #tfai-page.show{display:block!important}
-  /* Quick commands: text only, no per-command edit/delete controls */
   #tfai-page .tfai-quick{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:8px!important}
   #tfai-page .tfai-command{display:inline-flex!important;width:auto!important;flex:0 0 auto!important;align-items:center!important;gap:0!important;position:relative!important}
   #tfai-page .tfai-chip{width:auto!important;max-width:280px!important;flex:0 0 auto!important;padding:8px 11px!important;font-size:16px!important;line-height:1.45!important;border-radius:9px!important}
-  /* Hard-hide both the wrapper and individual tool buttons even if older code recreates them */
   #tfai-page .tfai-tools,#tfai-page .tfai-tool{display:none!important;width:0!important;height:0!important;max-width:0!important;max-height:0!important;overflow:hidden!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;margin:0!important;padding:0!important;border:0!important}
   #tfai-page .tfai-command-toolbar{display:flex!important}
   #tfai-page .tfai-custom{display:none!important}
   #tfai-page .tfai-quick-add{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:26px!important;height:26px!important;padding:0!important;border:0!important;background:transparent!important;color:var(--muted)!important;font-size:22px!important;line-height:1!important;border-radius:6px!important;cursor:pointer!important;vertical-align:middle}
-  #tfai-page .tfai-quick-add:hover{background:rgba(99,91,255,.12);color:var(--cream)}
+  #tfai-page .tfai-quick-add:hover{background:rgba(99,92,255,.12);color:var(--cream)}
   #tfai-page .tfai-add-pop{display:none;margin-top:8px;gap:6px;align-items:center}
   #tfai-page .tfai-add-pop.show{display:flex}
   #tfai-page .tfai-add-pop input{flex:1;min-width:0;background:var(--input-bg,#111319);color:var(--cream);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px}
@@ -39,4 +37,77 @@
   function init(){cleanBrand();addThemeButton();addQuickPlus();hardClean()}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();[100,300,700,1500,3000,5000].forEach(t=>setTimeout(init,t));
   new MutationObserver(()=>{hardClean()}).observe(document.documentElement,{childList:true,subtree:true});
+})();
+
+(()=>{
+  if(window.__TASKFLOW_SUCCESS_NOTIFICATIONS__)return;
+  window.__TASKFLOW_SUCCESS_NOTIFICATIONS__=true;
+  const style=document.createElement('style');
+  style.textContent=`
+    #toast{min-width:280px;max-width:min(92vw,460px);display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;font-weight:700;box-shadow:0 12px 35px rgba(0,0,0,.35);backdrop-filter:blur(8px)}
+    #toast.tf-success{border-color:#10b981;background:#10241e;color:#d1fae5}
+    #toast.tf-error{border-color:#ef4444;background:#2a1518;color:#fee2e2}
+    #toast.tf-info{border-color:#635bff;background:#171a2d;color:#e0e7ff}
+    #toast .tf-toast-icon{font-size:18px;line-height:1}
+    @media(max-width:700px){#toast{left:10px;right:10px;bottom:12px;min-width:0;max-width:none;justify-content:center;text-align:center}}
+    .tf-delete-task{margin-inline-start:6px;font-size:11px!important}
+  `;
+  document.head.appendChild(style);
+  let timer=null;
+  function notify(message,type='success'){
+    const el=document.getElementById('toast');
+    if(!el)return;
+    clearTimeout(timer);
+    el.className='toast show tf-'+type;
+    const icon=type==='success'?'✓':type==='error'?'!':'i';
+    el.innerHTML='<span class="tf-toast-icon">'+icon+'</span><span></span>';
+    el.lastElementChild.textContent=message;
+    timer=setTimeout(()=>el.classList.remove('show'),2800);
+  }
+  window.tfNotifySuccess=message=>notify(message,'success');
+  window.tfNotifyError=message=>notify(message,'error');
+  window.tfNotifyInfo=message=>notify(message,'info');
+  window.toast=message=>notify(message,'success');
+
+  const wrap=(name,successMessage)=>{
+    const original=window[name];
+    if(typeof original!=='function'||original.__tfWrapped)return;
+    const wrapped=function(...args){const result=original.apply(this,args);if(successMessage)notify(successMessage,'success');return result;};
+    wrapped.__tfWrapped=true;
+    window[name]=wrapped;
+  };
+  wrap('toggleBlockMember','تم تحديث حالة العضو بنجاح');
+
+  const originalRenderTasks=window.renderTasks;
+  if(typeof originalRenderTasks==='function'&&!originalRenderTasks.__tfDeleteEnhanced){
+    const enhancedRenderTasks=function(...args){
+      const result=originalRenderTasks.apply(this,args);
+      const me=typeof window.getCurrentUser==='function'?window.getCurrentUser():{};
+      if(me&&me.type==='Manager'){
+        document.querySelectorAll('#taskTable tr').forEach(row=>{
+          const update=row.querySelector('button[onclick*="openEditTask"]');
+          if(!update||row.querySelector('.tf-delete-task'))return;
+          const match=(update.getAttribute('onclick')||'').match(/openEditTask\('([^']+)'\)/);
+          if(!match)return;
+          const b=document.createElement('button');
+          b.className='btn danger tf-delete-task';b.type='button';b.textContent='حذف';
+          b.onclick=()=>window.deleteTask(match[1]);
+          update.parentElement.appendChild(b);
+        });
+      }
+      return result;
+    };
+    enhancedRenderTasks.__tfDeleteEnhanced=true;
+    window.renderTasks=enhancedRenderTasks;
+  }
+
+  window.deleteTask=async function(key){
+    if(!key)return;
+    const task=(window.tasks||[]).find(t=>t.firebaseKey===key);
+    if(!task)return;
+    if(!confirm('هل أنت متأكد من حذف هذه المهمة نهائياً؟'))return;
+    try{await firebase.database().ref('tasks/'+key).remove();notify('تم حذف المهمة بنجاح','success');}
+    catch(error){console.error(error);notify('تعذر حذف المهمة','error');}
+  };
+  setTimeout(()=>{if(typeof window.renderTasks==='function')window.renderTasks();},0);
 })();
