@@ -6,6 +6,7 @@ on:
     paths:
       - 'index.html'
       - 'taskflow-ai-widget.js'
+      - 'ai-data-layer.js'
       - '.github/workflows/integrate-taskflow-ai.yml'
 
 permissions:
@@ -21,14 +22,10 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Add TaskFlow AI script to original dashboard
+      - name: Integrate TaskFlow AI data layer and widget
         shell: bash
         run: |
           set -e
-          if grep -q 'taskflow-ai-widget.js' index.html; then
-            echo 'TaskFlow AI is already integrated.'
-            exit 0
-          fi
           python - <<'PY'
           from pathlib import Path
           p = Path('index.html')
@@ -36,11 +33,26 @@ jobs:
           marker = '</head>'
           if marker not in s:
               raise SystemExit('Could not find </head> in index.html')
-          s = s.replace(marker, '  <script src="/taskflow-ai-widget.js" defer></script>\n'+marker, 1)
-          p.write_text(s, encoding='utf-8')
+          tags = [
+              '<script src="/ai-data-layer.js" defer></script>',
+              '<script src="/taskflow-ai-widget.js" defer></script>'
+          ]
+          changed = False
+          for tag in tags:
+              if tag not in s:
+                  s = s.replace(marker, '  ' + tag + '\n' + marker, 1)
+                  changed = True
+          if changed:
+              p.write_text(s, encoding='utf-8')
+          else:
+              print('TaskFlow AI integration is already complete.')
           PY
+          if git diff --quiet -- index.html; then
+            echo 'No dashboard integration changes needed.'
+            exit 0
+          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'feat: integrate TaskFlow AI into original dashboard'
+          git commit -m 'feat: connect TaskFlow AI to live data layer'
           git push origin main
