@@ -14,6 +14,9 @@
   .tf-side-tool:hover{background:rgba(99,91,255,.14);border-color:#635bff}.tf-side-tool .ico{width:25px;text-align:center;font-size:17px}
   .tf-excel-status{padding:8px 12px;font-size:11px;color:#10b981;display:none}
   html.tf-day .tf-side-tool{background:#f8fafc;color:#18202b}
+  #tfai-page{right:260px!important;left:0!important;top:0!important;bottom:0!important;inset:auto!important;padding:24px!important;z-index:9996!important}
+  #tfai-page.show{display:block!important}
+  @media(max-width:700px){#tfai-page{right:0!important;padding:10px!important}}
   `;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
   const root=document.documentElement;
   function setTheme(mode){root.classList.toggle('tf-day',mode==='day');localStorage.setItem('taskflow_theme',mode);const b=document.getElementById('tf-theme-toggle');if(b){b.textContent=mode==='day'?'☀️':'🌙';b.title=mode==='day'?'التحويل إلى الوضع الليلي':'التحويل إلى الوضع النهاري'}}
