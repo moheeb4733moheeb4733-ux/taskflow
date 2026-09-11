@@ -33,7 +33,8 @@ export default async function handler(req, res) {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({
-      model: process.env.GEMINI_MODEL || 'gemini-2.5-flash'
+      // Stable, cost-effective model suitable for TaskFlow's operational AI.
+      model: process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite'
     });
 
     const prompt = `أنت مساعد إدارة عمليات اسمه TaskFlow AI.
@@ -56,6 +57,13 @@ ${excelSummary}
     return res.status(200).json({ ok: true, answer: text });
   } catch (error) {
     console.error('TaskFlow AI error:', error);
-    return res.status(500).json({ error: 'AI request failed' });
+    const status = Number(error?.status) || 500;
+    const message = String(error?.message || 'AI request failed')
+      .replace(/AIza[0-9A-Za-z_-]+/g, '[REDACTED]')
+      .slice(0, 1000);
+    return res.status(status >= 400 && status < 600 ? status : 500).json({
+      error: 'AI request failed',
+      details: message
+    });
   }
 }
