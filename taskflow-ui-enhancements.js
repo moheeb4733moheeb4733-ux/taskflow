@@ -103,8 +103,6 @@
 
   window.deleteTask=async function(key){
     if(!key)return;
-    const task=(window.tasks||[]).find(t=>t.firebaseKey===key);
-    if(!task)return;
     if(!confirm('هل أنت متأكد من حذف هذه المهمة نهائياً؟'))return;
     try{await firebase.database().ref('tasks/'+key).remove();notify('تم حذف المهمة بنجاح','success');}
     catch(error){console.error(error);notify('تعذر حذف المهمة','error');}
