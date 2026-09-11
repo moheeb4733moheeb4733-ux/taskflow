@@ -7,6 +7,7 @@ on:
       - 'index.html'
       - 'taskflow-ai-widget.js'
       - 'ai-data-layer.js'
+      - 'taskflow-theme.js'
       - '.github/workflows/integrate-taskflow-ai.yml'
 
 permissions:
@@ -22,7 +23,7 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Integrate TaskFlow AI data layer and widget
+      - name: Integrate TaskFlow AI and theme
         shell: bash
         run: |
           set -e
@@ -35,7 +36,8 @@ jobs:
               raise SystemExit('Could not find </head> in index.html')
           tags = [
               '<script src="/ai-data-layer.js" defer></script>',
-              '<script src="/taskflow-ai-widget.js" defer></script>'
+              '<script src="/taskflow-ai-widget.js" defer></script>',
+              '<script src="/taskflow-theme.js" defer></script>'
           ]
           changed = False
           for tag in tags:
@@ -45,7 +47,7 @@ jobs:
           if changed:
               p.write_text(s, encoding='utf-8')
           else:
-              print('TaskFlow AI integration is already complete.')
+              print('TaskFlow AI/theme integration is already complete.')
           PY
           if git diff --quiet -- index.html; then
             echo 'No dashboard integration changes needed.'
@@ -54,5 +56,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'feat: connect TaskFlow AI to live data layer'
+          git commit -m 'feat: integrate TaskFlow day night theme'
           git push origin main
