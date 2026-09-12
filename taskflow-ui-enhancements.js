@@ -109,3 +109,114 @@
   };
   setTimeout(()=>{if(typeof window.renderTasks==='function')window.renderTasks();},0);
 })();
+
+// حماية مدير النظام الأساسي من التغيير أو التعطيل أو الحذف من واجهة TaskFlow
+(()=>{
+  if(window.__TASKFLOW_PROTECTED_ADMIN__)return;
+  window.__TASKFLOW_PROTECTED_ADMIN__=true;
+  const PROTECTED_ADMIN_ID='-P0oi6mvkk6L9JM56fgH';
+  const PROTECTED_ADMIN={type:'Manager',role:'مدير النظام',status:'active'};
+  window.TASKFLOW_PROTECTED_ADMIN_ID=PROTECTED_ADMIN_ID;
+
+  function isProtected(key){return key===PROTECTED_ADMIN_ID;}
+  function warn(){
+    if(typeof window.tfNotifyInfo==='function') window.tfNotifyInfo('حساب مدير النظام الأساسي محمي ولا يمكن تغيير صلاحياته أو تعطيله أو حذفه');
+    else if(typeof window.toast==='function') window.toast('حساب مدير النظام الأساسي محمي ولا يمكن تغيير صلاحياته أو تعطيله أو حذفه');
+  }
+
+  // منع حذف المدير الأساسي قبل تنفيذ أي حذف
+  const originalDeleteMember=window.deleteMember;
+  if(typeof originalDeleteMember==='function'){
+    window.deleteMember=function(key){
+      if(isProtected(key)){warn();return;}
+      return originalDeleteMember.apply(this,arguments);
+    };
+  }
+
+  // منع تعطيل/تفعيل المدير الأساسي
+  const originalToggleBlockMember=window.toggleBlockMember;
+  if(typeof originalToggleBlockMember==='function'){
+    window.toggleBlockMember=function(key,st){
+      if(isProtected(key)){warn();return;}
+      return originalToggleBlockMember.apply(this,arguments);
+    };
+  }
+
+  // منع فتح صلاحيات الأيقونات للمدير الأساسي، مع إبقاء الحسابات الأخرى طبيعية
+  const originalOpenPermissionsModal=window.openPermissionsModal;
+  if(typeof originalOpenPermissionsModal==='function'){
+    window.openPermissionsModal=function(key){
+      if(isProtected(key)){warn();return;}
+      return originalOpenPermissionsModal.apply(this,arguments);
+    };
+  }
+
+  // منع تعديل الدور/النوع/الحالة في نموذج المدير الأساسي مع إبقاء الاسم وكلمة المرور قابلين للتعديل
+  const originalEditMemberModal=window.editMemberModal;
+  if(typeof originalEditMemberModal==='function'){
+    window.editMemberModal=function(key){
+      const result=originalEditMemberModal.apply(this,arguments);
+      if(isProtected(key)){
+        const role=document.getElementById('mRole');
+        const type=document.getElementById('mType');
+        if(role){role.value=PROTECTED_ADMIN.role;role.disabled=true;role.dataset.protected='true';}
+        if(type){type.value=PROTECTED_ADMIN.type;type.disabled=true;type.dataset.protected='true';}
+        const modal=document.getElementById('memberModal');
+        if(modal){
+          const title=modal.querySelector('#memberModalTitle');
+          if(title) title.textContent='تعديل بيانات مدير النظام الأساسي';
+        }
+      }
+      return result;
+    };
+  }
+
+  // الحارس النهائي قبل حفظ نموذج العضو: يثبت role/type/status للمدير الأساسي مهما كانت قيم النموذج
+  const memberForm=document.getElementById('memberForm');
+  if(memberForm){
+    memberForm.addEventListener('submit',function(e){
+      if(window.editingMemberKey===PROTECTED_ADMIN_ID){
+        const role=document.getElementById('mRole');
+        const type=document.getElementById('mType');
+        if(role)role.value=PROTECTED_ADMIN.role;
+        if(type)type.value=PROTECTED_ADMIN.type;
+        const current=Array.isArray(window.members)?window.members.find(m=>m.firebaseKey===PROTECTED_ADMIN_ID):null;
+        if(current){
+          // حفظ الاسم وكلمة المرور المسموح بهما فقط، مع إعادة تثبيت الصلاحيات والحالة
+          const data={name:document.getElementById('mName')?.value||current.name,role:PROTECTED_ADMIN.role,type:PROTECTED_ADMIN.type,pass:document.getElementById('mPass')?.value||current.pass,status:PROTECTED_ADMIN.status};
+          e.preventDefault();
+          firebase.database().ref('members/'+PROTECTED_ADMIN_ID).update(data).then(()=>{
+            if(typeof window.closeMemberModal==='function')window.closeMemberModal();
+            if(typeof window.toast==='function')window.toast('تم حفظ البيانات المسموح بها لمدير النظام الأساسي');
+          });
+        }
+      }
+    },true);
+  }
+
+  // عند عرض الأعضاء، إخفاء أدوات التعطيل والحذف والصلاحيات للمدير الأساسي فقط
+  function protectAdminCard(){
+    const grid=document.getElementById('membersGrid');
+    if(!grid)return;
+    const cards=grid.querySelectorAll('.card');
+    cards.forEach(card=>{
+      const edit=card.querySelector('button[onclick*="editMemberModal"]');
+      if(!edit)return;
+      const match=(edit.getAttribute('onclick')||'').match(/editMemberModal\('([^']+)'\)/);
+      if(!match||!isProtected(match[1]))return;
+      card.querySelectorAll('button').forEach(btn=>{
+        const onclick=btn.getAttribute('onclick')||'';
+        if(onclick.includes('toggleBlockMember')||onclick.includes('deleteMember')||onclick.includes('openPermissionsModal')){
+          btn.disabled=true;btn.style.display='none';
+        }
+      });
+      const roleLine=card.querySelector('.memberinfo small');
+      if(roleLine&&!roleLine.textContent.includes('محمي')){
+        roleLine.innerHTML+=' · <b style="color:var(--green)">محمي</b>';
+      }
+    });
+  }
+  const observer=new MutationObserver(protectAdminCard);
+  observer.observe(document.documentElement,{childList:true,subtree:true});
+  [0,100,300,700,1500].forEach(t=>setTimeout(protectAdminCard,t));
+})();
