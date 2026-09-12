@@ -1,64 +1,32 @@
-/* TaskFlow notifications + Remember Me hotfix */
+/* TaskFlow notifications + Remember Me + scoped access fixes */
 (function(){
 'use strict';
 const STYLE_ID='tf-dashboard-notify-style',TOAST_ID='tf-dashboard-notify-toast',MODAL_ID='tf-dashboard-confirm';
-function styles(){if(document.getElementById(STYLE_ID))return;const s=document.createElement('style');s.id=STYLE_ID;s.textContent=`#${TOAST_ID}{position:fixed;left:24px;top:50%;z-index:10000;min-width:280px;max-width:420px;padding:14px 18px;border-radius:14px;background:rgba(23,26,35,.97);color:#fff;border:1px solid #10b981;box-shadow:0 14px 40px rgba(0,0,0,.35);display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(-50%) translateX(-24px);pointer-events:none;transition:.25s;font-size:14px;font-weight:700;direction:rtl}#${TOAST_ID}.show{opacity:1;transform:translateY(-50%) translateX(0)}#${TOAST_ID} .tf-check{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#10b981;color:#07130e;flex:0 0 auto}#tf-remember-row{display:flex;align-items:center;gap:8px;margin:-4px 0 18px;color:#cbd5e1;font-size:12px;cursor:pointer;user-select:none}#tf-remember-row input{width:17px;height:17px;accent-color:#635bff;cursor:pointer}`;document.head.appendChild(s)}
+function styles(){if(document.getElementById(STYLE_ID))return;const s=document.createElement('style');s.id=STYLE_ID;s.textContent=`#${TOAST_ID}{position:fixed;left:24px;top:50%;z-index:10000;min-width:280px;max-width:420px;padding:14px 18px;border-radius:14px;background:rgba(23,26,35,.97);color:#fff;border:1px solid #10b981;box-shadow:0 14px 40px rgba(0,0,0,.35);display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(-50%) translateX(-24px);pointer-events:none;transition:.25s;font-size:14px;font-weight:700;direction:rtl}#${TOAST_ID}.show{opacity:1;transform:translateY(-50%) translateX(0)}#${TOAST_ID} .tf-check{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#10b981;color:#07130e;flex:0 0 auto}#tf-remember-row{display:flex;align-items:center;gap:8px;margin:-4px 0 18px;color:#cbd5e1;font-size:12px;cursor:pointer;user-select:none}#tf-remember-row input{width:17px;height:17px;accent-color:#635bff;cursor:pointer}#tfai-float,#tfai-page,.tfai-nav{visibility:hidden;opacity:0;pointer-events:none}body.tf-authenticated #tfai-float,body.tf-authenticated #tfai-page,body.tf-authenticated .tfai-nav{visibility:visible;opacity:1;pointer-events:auto}`;document.head.appendChild(s)}
 function success(msg){styles();let t=document.getElementById(TOAST_ID);if(!t){t=document.createElement('div');t.id=TOAST_ID;document.body.appendChild(t)}t.innerHTML='<span class="tf-check">✓</span><span></span>';t.querySelector('span:last-child').textContent=msg;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),3000)}
 window.taskflowSuccess=success;
-function remember(){const form=document.getElementById('loginForm');if(!form||form.dataset.tfRememberInstalled)return;styles();let row=document.getElementById('tf-remember-row');if(!row){row=document.createElement('label');row.id='tf-remember-row';row.innerHTML='<input type="checkbox" id="tfRememberMe"><span>تذكرني على هذا الجهاز</span>';const pass=document.getElementById('loginPassInput');if(pass&&pass.closest('.field'))pass.closest('.field').insertAdjacentElement('afterend',row);else form.appendChild(row)}const cb=document.getElementById('tfRememberMe');if(cb)cb.checked=localStorage.getItem('taskflow_remember_me')==='1';form.addEventListener('submit',function(){const keep=!!document.getElementById('tfRememberMe')?.checked;if(keep){localStorage.setItem('taskflow_remember_me','1')}else{localStorage.removeItem('taskflow_remember_me');setTimeout(()=>localStorage.removeItem('taskflow_user_id'),500)}});form.dataset.tfRememberInstalled='1'}
-function restore(){const id=localStorage.getItem('taskflow_user_id');if(!id)return;const list=(typeof members!=='undefined'&&Array.isArray(members))?members:[];const user=list.find(m=>m.firebaseKey===id);if(!user||user.status==='disabled')return;window.currentUserId=id;const login=document.getElementById('loginScreen'),app=document.getElementById('appMain');if(login)login.style.display='none';if(app)app.style.display='flex';window.applyUserPermissions?.(user)}
+function remember(){const form=document.getElementById('loginForm');if(!form||form.dataset.tfRememberInstalled)return;styles();let row=document.getElementById('tf-remember-row');if(!row){row=document.createElement('label');row.id='tf-remember-row';row.innerHTML='<input type="checkbox" id="tfRememberMe"><span>تذكرني على هذا الجهاز</span>';const pass=document.getElementById('loginPassInput');if(pass&&pass.closest('.field'))pass.closest('.field').insertAdjacentElement('afterend',row);else form.appendChild(row)}const cb=document.getElementById('tfRememberMe');if(cb)cb.checked=localStorage.getItem('taskflow_remember_me')==='1';form.addEventListener('submit',function(){const keep=!!document.getElementById('tfRememberMe')?.checked;if(keep)localStorage.setItem('taskflow_remember_me','1');else{localStorage.removeItem('taskflow_remember_me');setTimeout(()=>localStorage.removeItem('taskflow_user_id'),500)}});form.dataset.tfRememberInstalled='1'}
+function restore(){const id=localStorage.getItem('taskflow_user_id');if(!id)return;const list=(typeof members!=='undefined'&&Array.isArray(members))?members:[];const user=list.find(m=>m.firebaseKey===id);if(!user||user.status==='disabled')return;window.currentUserId=id;const login=document.getElementById('loginScreen'),app=document.getElementById('appMain');if(login)login.style.display='none';if(app)app.style.display='flex';if(typeof window.applyUserPermissions==='function')window.applyUserPermissions(user);syncAuthUI()}
+function syncAuthUI(){styles();const app=document.getElementById('appMain');const logged=!!app&&getComputedStyle(app).display!=='none'&&!!localStorage.getItem('taskflow_user_id');document.body.classList.toggle('tf-authenticated',logged);if(!logged){document.getElementById('tfai-page')?.classList.remove('show')}}
 function confirmDelete(key){styles();let m=document.getElementById(MODAL_ID);if(!m){m=document.createElement('div');m.id=MODAL_ID;m.style.cssText='position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.68);display:flex;align-items:center;justify-content:center;padding:20px';m.innerHTML='<div style="width:min(440px,100%);background:#171a23;border:1px solid #2a2e3d;border-radius:18px;padding:22px;color:#fff;direction:rtl"><h3>تأكيد العملية</h3><p>هل أنت متأكد من حذف هذا العضو نهائياً؟</p><div style="display:flex;gap:9px;justify-content:flex-start;margin-top:20px"><button id="tfCancel" style="padding:10px 16px">إلغاء</button><button id="tfYes" style="padding:10px 16px;background:#581c20;color:#fff;border:1px solid #b51f32">تأكيد</button></div></div>';document.body.appendChild(m);m.querySelector('#tfCancel').onclick=()=>m.remove()}m.querySelector('#tfYes').onclick=()=>{m.remove();if(window.firebase?.database){firebase.database().ref('members/'+key).remove().then(()=>success('تم حذف العضو بنجاح.')).catch(e=>success('تعذر حذف العضو: '+(e?.message||'خطأ')))}}}
 window.deleteMember=confirmDelete;
-function boot(){styles();remember();setTimeout(restore,300);setTimeout(remember,1000)}
+function syncPermissions(){try{const u=typeof getCurrentUser==='function'?getCurrentUser():null;if(u&&u.firebaseKey&&typeof window.applyUserPermissions==='function')window.applyUserPermissions(u)}catch(e){}}
+function installPermissionSync(){if(typeof window.applyUserPermissions!=='function'||window.applyUserPermissions.__tfSync)return;const original=window.applyUserPermissions;const wrapped=function(user){const r=original.apply(this,arguments);setTimeout(syncAuthUI,0);return r};wrapped.__tfSync=true;window.applyUserPermissions=wrapped}
+function boot(){styles();remember();installPermissionSync();setTimeout(restore,300);setTimeout(remember,1000);setTimeout(syncPermissions,700);syncAuthUI()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+[300,1000,2000,4000].forEach(t=>setTimeout(()=>{installPermissionSync();syncPermissions();syncAuthUI()},t));
+setInterval(()=>{syncPermissions();syncAuthUI()},1200);
 })();
 
-/* Kanban access control: managers see the full board; members see only their assigned tasks. */
+/* Kanban: managers see all tasks; members see only tasks assigned to themselves. */
 (function(){
 'use strict';
-const HIDE_STYLE_ID='tf-kanban-access-style';
-function getMe(){try{if(typeof getCurrentUser==='function')return getCurrentUser()}catch(e){}return null}
-function isManager(){const me=getMe();return !!me&&me.type==='Manager'}
-function renderManagerBoard(){
-  const grid=document.getElementById('boardGrid');
-  if(!grid)return;
-  const me=getMe();
-  if(!me)return;
-  const list=Array.isArray(tasks)?tasks:[];
-  const ms=Array.isArray(members)?members:[];
-  const visible=isManager()?list:list.filter(x=>x.memberKey===me.firebaseKey);
-  const cols=[['Pending','لم تبدأ'],['In Progress','قيد التنفيذ'],['Completed','مكتملة'],['Overdue','متأخرة']];
-  grid.innerHTML=cols.map(([st,label])=>{
-    const colTasks=visible.filter(x=>x.status===st);
-    return `<div class="column"><div class="colhead"><b>${label}</b><span class="badge">${colTasks.length}</span></div><div class="dropzone" data-status="${st}" ondragover="event.preventDefault()" ondrop="dropTask(event)">${colTasks.map(x=>{const owner=ms.find(m=>m.firebaseKey===x.memberKey);return `<div class="boardcard" draggable="${isManager()||x.memberKey===me.firebaseKey}" ondragstart="event.dataTransfer.setData('text/plain','${x.firebaseKey}')"><b>${x.title}</b><div class="meta">${isManager()?(owner?owner.name:'—'):'مهمتي'}</div><div class="progressbar" style="margin-top:8px"><i style="width:${x.progress||0}%"></i></div></div>`}).join('')}</div></div>`;
-  }).join('');
-}
-function applyAccess(){
-  const nav=document.getElementById('nav_board'),page=document.getElementById('board');
-  if(!nav||!page)return;
-  const manager=isManager();
-  if(manager){
-    nav.style.removeProperty('display');
-    page.dataset.tfKanbanAllowed='1';
-  }else{
-    nav.style.setProperty('display','none','important');
-    page.classList.remove('active');
-    page.dataset.tfKanbanAllowed='0';
-    const active=document.querySelector('.page.active');
-    if(!active||active.id==='board')document.getElementById('dashboard')?.classList.add('active');
-  }
-  renderManagerBoard();
-}
-function installGuard(){
-  if(document.getElementById(HIDE_STYLE_ID))return;
-  const s=document.createElement('style');s.id=HIDE_STYLE_ID;s.textContent='#nav_board[data-tf-hidden="1"]{display:none!important}';document.head.appendChild(s);
-  const nav=document.getElementById('nav_board');
-  if(nav&&!nav.dataset.tfKanbanGuard){
-    nav.dataset.tfKanbanGuard='1';
-    nav.addEventListener('click',e=>{if(!isManager()){e.preventDefault();e.stopImmediatePropagation();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('dashboard')?.classList.add('active');}},true);
-  }
-}
-function boot(){installGuard();applyAccess()}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-[300,1000,2500].forEach(t=>setTimeout(boot,t));
+function me(){try{return typeof getCurrentUser==='function'?getCurrentUser():null}catch(e){return null}}
+function manager(){const u=me();return !!u&&u.type==='Manager'}
+function visibleTasks(){const u=me();const all=Array.isArray(tasks)?tasks:[];if(!u||!u.firebaseKey)return [];return manager()?all:all.filter(t=>t.memberKey===u.firebaseKey)}
+function scopedRender(){const grid=document.getElementById('boardGrid');if(!grid||!document.getElementById('appMain')||getComputedStyle(document.getElementById('appMain')).display==='none')return;const u=me();if(!u||!u.firebaseKey)return;const all=visibleTasks(),ms=Array.isArray(members)?members:[];const cols=[['Pending','لم تبدأ'],['In Progress','قيد التنفيذ'],['Completed','مكتملة']];grid.innerHTML=cols.map(([st,label])=>{const colTasks=all.filter(x=>x.status===st);return `<div class="column"><div class="colhead"><b>${label}</b><span class="badge">${colTasks.length}</span></div><div class="dropzone" data-status="${st}" ondragover="event.preventDefault()" ondrop="dropTask(event)">${colTasks.map(x=>{const owner=ms.find(m=>m.firebaseKey===x.memberKey);return `<div class="boardcard" draggable="true" ondragstart="event.dataTransfer.setData('text/plain','${x.firebaseKey}')"><b>${x.title}</b><div class="meta">${manager()?(owner?owner.name:'—'):'مهمتي'}</div><div class="progressbar" style="margin-top:8px"><i style="width:${x.progress||0}%"></i></div></div>`}).join('')}</div></div>`}).join('')}
+function wrapBoard(){const original=window.renderBoard;if(typeof original!=='function'||original.__tfScoped)return;const wrapped=function(){const r=original.apply(this,arguments);scopedRender();return r};wrapped.__tfScoped=true;window.renderBoard=wrapped;scopedRender()}
+function wrapDrop(){const original=window.dropTask;if(typeof original!=='function'||original.__tfScopedDrop)return;const wrapped=function(e){const key=e?.dataTransfer?.getData('text/plain');if(!manager()){const u=me();const t=(Array.isArray(tasks)?tasks:[]).find(x=>x.firebaseKey===key);if(!u||!t||t.memberKey!==u.firebaseKey)return;}return original.apply(this,arguments)};wrapped.__tfScopedDrop=true;window.dropTask=wrapped}
+function boot(){wrapBoard();wrapDrop();const nav=document.getElementById('nav_board');if(nav&&!nav.dataset.tfBoardHook){nav.dataset.tfBoardHook='1';nav.addEventListener('click',()=>setTimeout(scopedRender,0))}scopedRender()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();[200,700,1500,3000].forEach(t=>setTimeout(boot,t));
 })();
