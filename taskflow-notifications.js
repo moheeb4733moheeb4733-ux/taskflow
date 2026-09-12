@@ -13,43 +13,52 @@ function boot(){styles();remember();setTimeout(restore,300);setTimeout(remember,
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
 
-/* Kanban visibility: managers see all tasks; members see only tasks assigned to themselves. */
+/* Kanban access control: managers see the full board; members see only their assigned tasks. */
 (function(){
 'use strict';
-function me(){try{return typeof getCurrentUser==='function'?getCurrentUser():null}catch(e){return null}}
-function manager(){const u=me();return !!u&&u.type==='Manager'}
-function renderScopedBoard(){
+const HIDE_STYLE_ID='tf-kanban-access-style';
+function getMe(){try{if(typeof getCurrentUser==='function')return getCurrentUser()}catch(e){}return null}
+function isManager(){const me=getMe();return !!me&&me.type==='Manager'}
+function renderManagerBoard(){
   const grid=document.getElementById('boardGrid');
-  if(!grid||typeof tasks==='undefined')return;
-  const u=me();
-  if(!u||!u.firebaseKey)return;
-  const list=manager()?tasks:tasks.filter(t=>t.memberKey===u.firebaseKey);
-  const ms=(typeof members!=='undefined'&&Array.isArray(members))?members:[];
-  const cols=[['Pending','لم تبدأ'],['In Progress','قيد التنفيذ'],['Completed','مكتملة']];
+  if(!grid)return;
+  const me=getMe();
+  if(!me)return;
+  const list=Array.isArray(tasks)?tasks:[];
+  const ms=Array.isArray(members)?members:[];
+  const visible=isManager()?list:list.filter(x=>x.memberKey===me.firebaseKey);
+  const cols=[['Pending','لم تبدأ'],['In Progress','قيد التنفيذ'],['Completed','مكتملة'],['Overdue','متأخرة']];
   grid.innerHTML=cols.map(([st,label])=>{
-    const colTasks=list.filter(x=>x.status===st);
-    return `<div class="column"><div class="colhead"><b>${label}</b><span class="badge">${colTasks.length}</span></div><div class="dropzone" data-status="${st}" ondragover="event.preventDefault()" ondrop="dropTask(event)">${colTasks.map(x=>{const owner=ms.find(m=>m.firebaseKey===x.memberKey);return `<div class="boardcard" draggable="true" ondragstart="event.dataTransfer.setData('text/plain','${x.firebaseKey}')"><b>${x.title}</b><div class="meta">${owner?owner.name:'—'}</div><div class="progressbar" style="margin-top:8px"><i style="width:${x.progress||0}%"></i></div></div>`}).join('')}</div></div>`;
+    const colTasks=visible.filter(x=>x.status===st);
+    return `<div class="column"><div class="colhead"><b>${label}</b><span class="badge">${colTasks.length}</span></div><div class="dropzone" data-status="${st}" ondragover="event.preventDefault()" ondrop="dropTask(event)">${colTasks.map(x=>{const owner=ms.find(m=>m.firebaseKey===x.memberKey);return `<div class="boardcard" draggable="${isManager()||x.memberKey===me.firebaseKey}" ondragstart="event.dataTransfer.setData('text/plain','${x.firebaseKey}')"><b>${x.title}</b><div class="meta">${isManager()?(owner?owner.name:'—'):'مهمتي'}</div><div class="progressbar" style="margin-top:8px"><i style="width:${x.progress||0}%"></i></div></div>`}).join('')}</div></div>`;
   }).join('');
 }
-function guardDrop(){
-  const original=window.dropTask;
-  if(typeof original!=='function'||original.__tfScoped)return;
-  const wrapped=function(e){
-    const key=e?.dataTransfer?.getData('text/plain');
-    if(!manager()&&key){const u=me();const t=(typeof tasks!=='undefined'&&Array.isArray(tasks))?tasks.find(x=>x.firebaseKey===key):null;if(!u||!t||t.memberKey!==u.firebaseKey)return;}
-    return original.apply(this,arguments);
-  };
-  wrapped.__tfScoped=true;
-  window.dropTask=wrapped;
+function applyAccess(){
+  const nav=document.getElementById('nav_board'),page=document.getElementById('board');
+  if(!nav||!page)return;
+  const manager=isManager();
+  if(manager){
+    nav.style.removeProperty('display');
+    page.dataset.tfKanbanAllowed='1';
+  }else{
+    nav.style.setProperty('display','none','important');
+    page.classList.remove('active');
+    page.dataset.tfKanbanAllowed='0';
+    const active=document.querySelector('.page.active');
+    if(!active||active.id==='board')document.getElementById('dashboard')?.classList.add('active');
+  }
+  renderManagerBoard();
 }
-function boot(){
+function installGuard(){
+  if(document.getElementById(HIDE_STYLE_ID))return;
+  const s=document.createElement('style');s.id=HIDE_STYLE_ID;s.textContent='#nav_board[data-tf-hidden="1"]{display:none!important}';document.head.appendChild(s);
   const nav=document.getElementById('nav_board');
-  if(nav)nav.style.removeProperty('display');
-  renderScopedBoard();
-  guardDrop();
+  if(nav&&!nav.dataset.tfKanbanGuard){
+    nav.dataset.tfKanbanGuard='1';
+    nav.addEventListener('click',e=>{if(!isManager()){e.preventDefault();e.stopImmediatePropagation();document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('dashboard')?.classList.add('active');}},true);
+  }
 }
+function boot(){installGuard();applyAccess()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
-[250,700,1500,3000].forEach(t=>setTimeout(boot,t));
-const obs=new MutationObserver(()=>{renderScopedBoard();guardDrop()});
-obs.observe(document.documentElement,{childList:true,subtree:true});
+[300,1000,2500].forEach(t=>setTimeout(boot,t));
 })();
