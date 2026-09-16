@@ -1,0 +1,41 @@
+name: TaskFlow validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(
+            taskflow-ai-widget.js
+            taskflow-ai-excel-full.js
+            taskflow-theme.js
+            taskflow-notifications.js
+            taskflow-permissions.js
+            taskflow-ui-enhancements.js
+            ai-data-layer.js
+            api/ai.js
+          )
+          for file in "${files[@]}"; do
+            echo "Checking $file"
+            node --check "$file"
+          done
+
+      - name: Validate package metadata
+        run: node -e "JSON.parse(require('fs').readFileSync('package.json','utf8')); console.log('package.json OK')"
